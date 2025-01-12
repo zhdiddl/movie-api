@@ -10,5 +10,5 @@ import java.util.List;
  * (e.g., databases, external APIs).
  */
 public interface MovieRepositoryPort {
-    List<Movie> findAllMovies();
+    List<Movie> findAll();
 }

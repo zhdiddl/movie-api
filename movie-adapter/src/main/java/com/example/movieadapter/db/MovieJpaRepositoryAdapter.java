@@ -20,7 +20,7 @@ public class MovieJpaRepositoryAdapter implements MovieRepositoryPort {
     private final MovieJpaRepository movieJpaRepository;
 
     @Override
-    public List<Movie> findAllMovies() {
+    public List<Movie> findAll() {
         return movieJpaRepository.findAll();
     }
 

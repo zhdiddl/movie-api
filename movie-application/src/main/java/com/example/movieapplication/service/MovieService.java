@@ -15,7 +15,7 @@ public class MovieService implements MovieServicePort {
 
     @Override
     public List<MovieResponseDto> getAllMovies() {
-        return movieRepositoryPort.findAllMovies().stream()
+        return movieRepositoryPort.findAll().stream()
                 .map(MovieResponseDto::fromEntity)
                 .toList();
     }

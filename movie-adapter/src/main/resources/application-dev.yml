@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # 데이터베이스를 재생성하고 data.sql 실행
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true # JPA 엔티티 초기화 이후 data.sql을 실행
     properties:

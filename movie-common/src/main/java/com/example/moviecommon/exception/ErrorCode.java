@@ -1,7 +1,9 @@
 package com.example.moviecommon.exception;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Getter
 public enum ErrorCode {
 
@@ -23,10 +25,5 @@ public enum ErrorCode {
 
     private final String message;
     private final int statusCode;
-
-    ErrorCode(String message, int statusCode) {
-        this.message = message;
-        this.statusCode = statusCode;
-    }
 
 }

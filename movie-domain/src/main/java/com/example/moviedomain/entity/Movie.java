@@ -3,9 +3,11 @@ package com.example.moviedomain.entity;
 import com.example.moviecommon.exception.CustomException;
 import com.example.moviecommon.exception.ErrorCode;
 import com.example.moviedomain.base.AuditingFields;
+import com.example.moviedomain.converter.ContentRatingConverter;
 import com.example.moviedomain.valueObject.ContentRating;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,7 +33,7 @@ public class Movie extends AuditingFields {
     @Column(nullable = false)
     private String title;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = ContentRatingConverter.class)
     @Column(nullable = false)
     private ContentRating contentRating;
 

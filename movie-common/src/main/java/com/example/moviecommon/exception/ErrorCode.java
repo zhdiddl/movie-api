@@ -18,6 +18,8 @@ public enum ErrorCode {
     INVALID_SCREENING_TIME("Screening date and time cannot be null or earlier than the release date.", 400),
     INVALID_THEATER_NAME("Theater name cannot be empty.", 400),
 
+    UNKNOWN_CONTENT_RATING("Unknown database value for ContentRating", 400),
+
     RESOURCE_NOT_FOUND("Resource not found", 404),
 
     INTERNAL_SERVER_ERROR("An internal server error occurred", 500),

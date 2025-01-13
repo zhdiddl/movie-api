@@ -2523,3 +2523,24 @@ INSERT INTO screening (movie_id, theater_id, screening_date, start_time, end_tim
 INSERT INTO screening (movie_id, theater_id, screening_date, start_time, end_time, created_at, created_by, modified_at, modified_by) VALUES (500, 16, '2025-01-27', '16:00:00', '17:57:00', '2025-01-10 11:10:53', 'system', '2025-01-10 11:10:53', 'system');
 INSERT INTO screening (movie_id, theater_id, screening_date, start_time, end_time, created_at, created_by, modified_at, modified_by) VALUES (500, 1, '2025-01-25', '13:00:00', '14:47:00', '2025-01-10 11:10:53', 'system', '2025-01-10 11:10:53', 'system');
 INSERT INTO screening (movie_id, theater_id, screening_date, start_time, end_time, created_at, created_by, modified_at, modified_by) VALUES (500, 3, '2025-01-15', '13:00:00', '14:50:00', '2025-01-10 11:10:53', 'system', '2025-01-10 11:10:53', 'system');
+
+-- contentRating 축약값으로 DB 저장
+-- 'ALL'을 'A'로 변환
+UPDATE movie
+SET content_rating = 'A'
+WHERE content_rating = 'ALL';
+
+-- 'TWELVE'을 'B'로 변환
+UPDATE movie
+SET content_rating = 'B'
+WHERE content_rating = 'TWELVE';
+
+-- 'FIFTEEN'을 'C'로 변환
+UPDATE movie
+SET content_rating = 'C'
+WHERE content_rating = 'FIFTEEN';
+
+-- 'ADULT'을 'D'로 변환
+UPDATE movie
+SET content_rating = 'D'
+WHERE content_rating = 'ADULT';

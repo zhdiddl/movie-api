@@ -16,7 +16,7 @@ services:
       - mysql_data:/var/lib/mysql          # 데이터 영구 저장 (볼륨 사용)
     command:
       - --character-set-server=utf8mb4         # 인코딩 규칙 (유니코드 4바이트 지원)
-      - --collation-server=utf8mb4_unicode_ci  # 정렬 규칙 (case insensitive)
+      - --collation-server=utf8mb4_0900_ai_ci  # 정렬 규칙 (대소문자 및 액센트 구분 없음)
 
 volumes:
   mysql_data:                              # 데이터가 유지될 볼륨 정의

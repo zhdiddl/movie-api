@@ -4,53 +4,67 @@
 
 ## 모듈 구성
 ```
-/redis_1st
-├── movie-api               # ✅ 외부 진입점 (API)
-│   ├── MovieApiApplication # 애플리케이션 진입점, 모든 모듈 스캔
-│   ├── controller          # API 컨트롤러
-│   └── resources
-│       └── application.yml # 애플리케이션 환경 설정
+redis-1st
 │
-├── movie-application       # ✅ 비즈니스 로직 (Service, Port)
-│   ├── service             # 비즈니스 서비스
-│   ├── port                
-│   │   └── in              # 서비스 포트
-│   │   └── out             # 레포지토리 포트
-│   └── dto                 # 클라이언트 반환을 위한 dto
+├── movie-domain                  ✅ 도메인 모듈 (핵심 비즈니스 로직)
+│   └── src/main/java/com/example/domain
+│       ├── model                 # 도메인 모델 (엔티티, 값 객체 등)
+│       ├── converter             # 도메인 관련 유틸 (db 값 컨버터)
+│       └── exception             # 도메인 예외 처리 (커스텀 익셉션, 에러 코드 등)
 │
-├── movie-adapter           # ✅ 인프라스트럭처 어댑터
-│   └── db                  # DB 레포지토리 및 어댑터 (JPA, Redis)
-│       └── config          # DB 환경 설정
-│   └── resources
-│       └── application-dev.yml  # DB 연결 정보 (개발용)
-│       └── application-prod.yml # DB 연결 정보 (운영용)
+├── movie-application             ✅  애플리케이션 서비스 모듈
+│   └── src/main/java/com/example/application
+│       ├── port                  # 서비스/리포지토리 포트 (인터페이스)
+│       ├── service               # 도메인 서비스 구현
+│       ├── dto                   # 데이터 전송 객체 (DTO)
+│       └── exception             # 애플리케이션 예외 처리 (핸들러)
 │
-├── movie-domain            # ✅ 순수 도메인 엔티티
-│   └── entity              # 엔티티 클래스 (Movie, Screening 등)
-│   └── valueObject         # VO (SeatNumber, ContentRating 등 불변 객체)
-│   └── base                # 공통 메타데이터 및 상속 클래스 (AuditingFields)
-│
-├── movie-common            # ✅ 공통 유틸리티
-│   └── exception           # 공통 예외 처리 (CustomException)
-│   └── utils               # 유틸리티 클래스
+├── movie-infrastructure          ✅  인프라스트럭처 모듈 + 애플리케이션 진입점
+│   └── src/main/java/com/example/infrastructure
+│       ├── web                   # 웹 관련 어댑터 (컨트롤러)
+│       └── persistence           # DB 어댑터 
+│       └── db                    # DB 구현체 
+│            └── config           # DB 설정
+└──
 ```
-### 모듈 역할
-- movie-api → Input Adapter & User Interface
-- movie-application → Business Logic (Use Case, Port)
-- movie-adapter → Output Adapter
-- movie-domain → Entity, Value Object
+- `movie-infrastructure` 모듈의 `infrastructureApplication`로 Spring Boot 애플리케이션을 실행합니다.
 
-## 아키텍처
-- `헥사고날 아키텍처` 기반으로 Port, Adapter를 활용
-- 핵심 비즈니스 로직이 외부에 의존하지 않도록 설계
-- 포트를 통해 데이터베이스와 같은 외부 시스템과 상호작용
-- 어댑터를 통해 포트를 세부 구현
+### 모듈 역할
+`헥사고날 아키텍처`를 기반으로 한 멀티모듈 구성
+
+#### movie-domain
+- `도메인` 모듈은 다른 모듈에 의존하지 않습니다.
+- 외부 기술의 저수준 변경사항으로부터 도메인을 지키는 헥사고날 아키텍처 원칙을 지향합니다.
+- 단, 아키텍처가 생산성을 저하시키지 않도록 JPA 엔티티를 예외적으로 허용했습니다.
+- 도메인의 핵심 로직을 책임지는 엔티티, 값 객체, 예외, 변환기 등의 요소를 포함합니다.
+
+#### movie-application 
+- `애플리케이션` 모듈은 `도메인` 모듈에 의존합니다. 
+- Inboud Port: 컨트롤러에서 DTO로 데이터를 주고 받을 때 호출할 서비스 포트를 제공합니다.
+- Outbound Port: DB와 통신하기 위해 서비스 계층에서 호출할 리포지토리 포트를 정의합니다.
+
+#### movie-infrastructure
+- `인프라스트럭처` 모듈은 `애플리케이션` 모듈과 `도메인` 모듈에 의존합니다.
+- 외부 시스템 및 DB와의 연결을 담당합니다.
+- Persistence adapter: 저장소와 상호작용하기 위해 리포지토리 포트를 구현합니다.
+
 
 ## 테이블 디자인
-- 테이블 관계
-```aiignore
-Movie 영화 → Screening 상영일시 (1:N)
-Screening 상영일시 → Seat 좌석 (1:N)
-Screening 상영일시 → Theater 상영관 (N:1)
+- `Movie` (영화): 영화의 기본 정보 저장
+- `Theater` (상영관): 상영관 정보를 관리
+- `Screening` (상영 정보): movie_id, theater_id를 각각 외래키로 참조하며 영화와 상영관을 연결
+- `Seat` (좌석 정보): theater_id를 외래키로 참조하여 각 상영관의 좌석 정보 저장
+    - `SeatNumber`를 Embedded 타입으로 구성해 좌석 번호 관련 로직을 분리 
+- `ContentRating` (상영 등급)을 Enum 으로 작성해 잘못된 값 입력을 방지
+- 모든 엔티티는 `AuditingFields` 를 상속해 createdBy, createdAt, modifiedBy, modifiedAt 정보를 관리
+
+####  테이블 관계 설정
 ```
-- 모든 테이블은 createdBy, createdAt, modifiedBy, modifiedAt 포함
+Screening (N) <-> Movie (1)
+Screening (N) -> Theater (1)
+Seat (N) -> Theater (1)
+```
+
+#### 데이터 설정
+- `v1.0__initial_schema.sql`로 DB 스키마를 정의합니다.
+- `data.sql`로 애플리케이션 시작 시 DB에 초기 데이터를 삽입합니다.

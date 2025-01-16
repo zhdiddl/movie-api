@@ -1,9 +1,7 @@
-package com.example.moviedomain.valueObject;
+package com.example.domain.model.valueObject;
 
 import static java.util.Objects.hash;
 
-import com.example.moviecommon.exception.CustomException;
-import com.example.moviecommon.exception.ErrorCode;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
@@ -20,9 +18,6 @@ public class SeatNumber {
     }
 
     public static SeatNumber of(String row, int column) {
-        if (!row.matches("[A-E]") || column < 1 || column > 5) {
-            throw new CustomException(ErrorCode.INVALID_SEAT_NUMBER);
-        }
         return new SeatNumber(row, column);
     }
 

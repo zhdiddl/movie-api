@@ -1,7 +1,8 @@
-package com.example.movieapplication.port.out;
+package com.example.application.port.out;
 
-import com.example.moviedomain.entity.Movie;
+import com.example.domain.model.entity.Movie;
 import java.util.List;
+import org.springframework.data.domain.Sort;
 
 /**
  * Represents a port for accessing movie data from a persistence layer.
@@ -10,5 +11,6 @@ import java.util.List;
  * (e.g., databases, external APIs).
  */
 public interface MovieRepositoryPort {
-    List<Movie> findAll();
+    List<Movie> findAll(Sort sort);
+    void createMovie(Movie movie);
 }

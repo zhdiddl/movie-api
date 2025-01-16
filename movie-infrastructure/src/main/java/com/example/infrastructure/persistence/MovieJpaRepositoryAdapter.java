@@ -1,9 +1,11 @@
-package com.example.movieadapter.db;
+package com.example.infrastructure.persistence;
 
-import com.example.movieapplication.port.out.MovieRepositoryPort;
-import com.example.moviedomain.entity.Movie;
+import com.example.application.port.out.MovieRepositoryPort;
+import com.example.domain.model.entity.Movie;
+import com.example.infrastructure.db.MovieJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -20,8 +22,13 @@ public class MovieJpaRepositoryAdapter implements MovieRepositoryPort {
     private final MovieJpaRepository movieJpaRepository;
 
     @Override
-    public List<Movie> findAll() {
-        return movieJpaRepository.findAll();
+    public List<Movie> findAll(Sort sort) {
+        return movieJpaRepository.findAll(sort);
+    }
+
+    @Override
+    public void createMovie(Movie movie) {
+        movieJpaRepository.save(movie);
     }
 
 }

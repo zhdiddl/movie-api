@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -24,8 +25,11 @@ public class MovieController {
     private final MovieServicePort movieServicePort;
 
     @GetMapping
-    public ResponseEntity<List<MovieResponseDto>> getAllMovies() {
-        List<MovieResponseDto> movies = movieServicePort.getMoviesSortedByReleaseDateDesc();
+    public ResponseEntity<List<MovieResponseDto>> getMovies(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String genre
+    ) {
+        List<MovieResponseDto> movies = movieServicePort.findMovies(title, genre);
         return ResponseEntity.ok(movies);
     }
 

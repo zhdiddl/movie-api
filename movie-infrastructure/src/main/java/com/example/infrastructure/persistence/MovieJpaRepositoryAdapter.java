@@ -24,8 +24,8 @@ public class MovieJpaRepositoryAdapter implements MovieRepositoryPort {
     private final MovieJpaRepository movieJpaRepository;
 
     @Override
-    public List<MovieProjection> findAll(Sort sort) {
-        return movieJpaRepository.findAllBy(sort);
+    public List<MovieProjection> findBy(String title, String genre, Sort sort) {
+        return movieJpaRepository.findByTitleContainingIgnoreCaseAndGenreContainingIgnoreCase(title, genre, sort);
     }
 
     @Override

@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort;
  * (e.g., databases, external APIs).
  */
 public interface MovieRepositoryPort {
-    List<MovieProjection> findAll(Sort sort);
+    List<MovieProjection> findBy(String title, String genre, Sort sort);
     void save(Movie movie);
     Optional<Movie> findById(Long id);
 }

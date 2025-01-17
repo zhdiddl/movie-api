@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MovieJpaRepository extends JpaRepository<Movie, Long> {
 
     @EntityGraph(attributePaths = {"screenings", "screenings.theater"})
-    List<MovieProjection> findAllBy(Sort sort);
+    List<MovieProjection> findByTitleContainingIgnoreCaseAndGenreContainingIgnoreCase(
+            String title, String genre, Sort sort);
 
 }

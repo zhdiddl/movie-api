@@ -6,7 +6,7 @@ import com.example.application.dto.response.MovieResponseDto;
 import java.util.List;
 
 public interface MovieServicePort {
-    List<MovieResponseDto> getMoviesSortedByReleaseDateDesc();
+    List<MovieResponseDto> findMovies(String title, String genre);
     void createMovie(MovieRequestDto movieRequestDto);
     void addScreeningToMovie(Long movieId, ScreeningRequestDto screeningRequestDto);
 }

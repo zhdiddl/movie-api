@@ -12,6 +12,7 @@ import com.example.domain.exception.ErrorCode;
 import com.example.domain.model.entity.Movie;
 import com.example.domain.model.entity.Screening;
 import com.example.domain.model.entity.Theater;
+import com.example.domain.model.projection.MovieProjection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -26,10 +27,10 @@ public class MovieService implements MovieServicePort {
     private final TheaterRepositoryPort theaterRepositoryPort;
 
     @Override
-    public List<MovieResponseDto> getMoviesSortedByReleaseDateDesc() {
+    public List<MovieResponseDto> findMovies(String title, String genre) {
         Sort sort = Sort.by("releaseDate").descending();
 
-        return movieRepositoryPort.findAll(sort).stream()
+        return movieRepositoryPort.findBy(title, genre, sort).stream()
                 .map(MovieResponseDto::fromProjection)
                 .toList();
     }

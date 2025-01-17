@@ -1,5 +1,5 @@
-### 영화 목록 조회 테스트 (GET)
-GET http://localhost:8080/api/v1/movies
+### 영화 목록 조회 (제목 및 장르 필터링) 테스트 (GET)
+GET http://localhost:8080/api/v1/movies?title=10&genre=Thriller
 Accept: application/json
 
 ### 영화 추가 테스트 (POST)

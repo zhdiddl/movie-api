@@ -30,7 +30,7 @@ public class MovieService implements MovieServicePort {
         Sort sort = Sort.by("releaseDate").descending();
 
         return movieRepositoryPort.findAll(sort).stream()
-                .map(MovieResponseDto::fromEntity)
+                .map(MovieResponseDto::fromProjection)
                 .toList();
     }
 

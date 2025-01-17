@@ -1,8 +1,10 @@
 package com.example.domain.model.entity;
 
 import com.example.domain.converter.ContentRatingConverter;
+import com.example.domain.converter.GenreConverter;
 import com.example.domain.model.base.AuditingFields;
 import com.example.domain.model.valueObject.ContentRating;
+import com.example.domain.model.valueObject.Genre;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -30,7 +32,8 @@ public class Movie extends AuditingFields {
     @Column(nullable = false) private LocalDate releaseDate;
     @Column(nullable = false) private String thumbnailUrl;
     @Column(nullable = false) private int runtimeMinutes;
-    @Column(nullable = false) private String genre;
+    @Convert(converter = GenreConverter.class)
+    @Column(nullable = false) private Genre genre;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     @OrderBy("startTime ASC")
@@ -44,7 +47,7 @@ public class Movie extends AuditingFields {
                   LocalDate releaseDate,
                   String thumbnailUrl,
                   int runtimeMinutes,
-                  String genre) {
+                  Genre genre) {
         this.title = title;
         this.contentRating = contentRating;
         this.releaseDate = releaseDate;
@@ -58,7 +61,7 @@ public class Movie extends AuditingFields {
                            LocalDate releaseDate,
                            String thumbnailUrl,
                            int runtimeMinutes,
-                           String genre) {
+                           Genre genre) {
         return new Movie(title, contentRating, releaseDate, thumbnailUrl, runtimeMinutes, genre);
     }
 

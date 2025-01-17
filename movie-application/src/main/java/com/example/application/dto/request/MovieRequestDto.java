@@ -1,6 +1,7 @@
 package com.example.application.dto.request;
 
 import com.example.domain.model.valueObject.ContentRating;
+import com.example.domain.model.valueObject.Genre;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -32,6 +33,6 @@ public record MovieRequestDto(
 
         @NotNull(message = "Genre must not be null")
         @Size(min = 1, message = "Genre must not be empty")
-        String genre
+        Genre genre
 
 ) {}

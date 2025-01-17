@@ -4,6 +4,7 @@ import com.example.application.dto.request.MovieRequestDto;
 import com.example.application.dto.request.ScreeningRequestDto;
 import com.example.application.dto.response.MovieResponseDto;
 import com.example.application.port.in.MovieServicePort;
+import com.example.domain.model.valueObject.Genre;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class MovieController {
     @GetMapping
     public ResponseEntity<List<MovieResponseDto>> getMovies(
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) String genre
+            @RequestParam(required = false) Genre genre
     ) {
         List<MovieResponseDto> movies = movieServicePort.findMovies(title, genre);
         return ResponseEntity.ok(movies);

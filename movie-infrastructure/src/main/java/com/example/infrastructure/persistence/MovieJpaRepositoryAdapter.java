@@ -4,6 +4,7 @@ import com.example.application.port.out.MovieRepositoryPort;
 import com.example.domain.model.entity.Movie;
 import com.example.infrastructure.db.MovieJpaRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -27,8 +28,13 @@ public class MovieJpaRepositoryAdapter implements MovieRepositoryPort {
     }
 
     @Override
-    public void createMovie(Movie movie) {
+    public void save(Movie movie) {
         movieJpaRepository.save(movie);
+    }
+
+    @Override
+    public Optional<Movie> findById(Long id) {
+        return movieJpaRepository.findById(id);
     }
 
 }

@@ -5,9 +5,6 @@ import java.time.LocalTime;
 
 public record ScreeningRequestDto(
 
-        @NotNull(message = "Movie must not be null")
-        Long movieId,
-
         @NotNull(message = "Theater must not be null")
         Long theaterId,
 

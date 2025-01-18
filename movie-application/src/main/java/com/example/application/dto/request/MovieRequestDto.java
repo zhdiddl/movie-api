@@ -32,7 +32,6 @@ public record MovieRequestDto(
         int runtimeMinutes,
 
         @NotNull(message = "Genre must not be null")
-        @Size(min = 1, message = "Genre must not be empty")
         Genre genre
 
 ) {}

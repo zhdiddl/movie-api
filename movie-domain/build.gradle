@@ -2,5 +2,6 @@ bootJar { enabled = false }
 jar { enabled = true }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // Jpa 엔티티 클래스 매핑을 위해 의존성 추가
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.3' // Enum 을 Json 으로 직렬화/역직렬화 위해 추가
 }

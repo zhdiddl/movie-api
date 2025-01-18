@@ -2,6 +2,8 @@ package com.example.domain.model.valueObject;
 
 import com.example.domain.exception.CustomException;
 import com.example.domain.exception.ErrorCode;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +22,16 @@ public enum Genre {
     ;
 
     private final int dbValue;
+
+    @JsonCreator
+    public static Genre fromJson(String value) {
+        for (Genre genre : Genre.values()) {
+            if (genre.name().equalsIgnoreCase(value)) {
+                return genre;
+            }
+        }
+        throw new CustomException(ErrorCode.INVALID_GENRE);
+    }
 
     private static final Map<Integer, Genre> MAP =
             Stream.of(values()).collect(Collectors.toMap(Genre::getDbValue, genre -> genre));

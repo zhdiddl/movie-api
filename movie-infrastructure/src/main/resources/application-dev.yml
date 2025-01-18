@@ -12,7 +12,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create # 실행시 스키마 새로 생성
+      ddl-auto: none # Hibernate가 DDL 실행하지 않음
     show-sql: true
     defer-datasource-initialization: true # JPA 엔티티 초기화 이후 data.sql을 실행
     properties:
@@ -24,7 +24,9 @@ spring:
         connection.collation: utf8mb4_unicode_ci
         format_sql: true  # SQL 보기 좋게 출력
 
-  sql.init.mode: always # 항상 data.sql 실행
+  sql.init.mode: never  # Spring의 schema.sql 및 data.sql 실행 방지
+  sql.init.schema-locations: classpath:v1.0__initial_schema.sql
+  sql.init.data-locations: classpath:data.sql
 
 logging:
   level:

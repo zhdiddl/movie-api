@@ -4,6 +4,7 @@ import com.example.application.dto.request.MovieRequestDto;
 import com.example.application.dto.request.ScreeningRequestDto;
 import com.example.application.dto.response.MovieResponseDto;
 import com.example.application.port.in.MovieServicePort;
+import com.example.application.validation.MovieValidation;
 import com.example.domain.model.valueObject.Genre;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,12 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class MovieController {
 
     private final MovieServicePort movieServicePort;
+    private final MovieValidation movieValidation;
 
     @GetMapping
     public ResponseEntity<List<MovieResponseDto>> getMovies(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Genre genre
     ) {
+        movieValidation.validateTitleLength(title);
+
         List<MovieResponseDto> movies = movieServicePort.findMovies(title, genre);
         return ResponseEntity.ok(movies);
     }

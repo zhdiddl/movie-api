@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Getter
 public enum Genre {
 
@@ -18,10 +20,6 @@ public enum Genre {
     ;
 
     private final int dbValue;
-
-    Genre(int dbValue) {
-        this.dbValue = dbValue;
-    }
 
     private static final Map<Integer, Genre> MAP =
             Stream.of(values()).collect(Collectors.toMap(Genre::getDbValue, genre -> genre));

@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Getter
 public enum ContentRating {
 
@@ -19,12 +21,6 @@ public enum ContentRating {
     private final String description;
     private final int ageLimit;
     private final String dbValue;
-
-    ContentRating(String description, int ageLimit, String dbValue) {
-        this.description = description;
-        this.ageLimit = ageLimit;
-        this.dbValue = dbValue;
-    }
 
     private static final Map<String, ContentRating> MAP =
             Stream.of(values()).collect(Collectors.toMap(ContentRating::getDbValue, contentRating -> contentRating));

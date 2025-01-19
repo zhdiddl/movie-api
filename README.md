@@ -10,6 +10,7 @@ redis-1st
 │   └── src/main/java/com/example/domain
 │       ├── model                 # 도메인 모델 (엔티티, 값 객체 등)
 │       ├── converter             # 도메인 관련 유틸 (db 값 컨버터)
+│       ├── validation            # 도메인 검증 로직
 │       └── exception             # 도메인 예외 처리 (커스텀 익셉션, 에러 코드 등)
 │
 ├── movie-application             ✅  애플리케이션 서비스 모듈
@@ -31,7 +32,7 @@ redis-1st
 ```
 - `movie-infrastructure` 모듈의 `infrastructureApplication`로 Spring Boot 애플리케이션을 실행합니다.
 - `movie-infrastructure` 모듈의 `resources`에 application.yml, DDL 파일이 위치합니다.
-- `movie-infrastructure` 모듈의 `test`에 .http, loadTest.js 파일이 위치합니다.
+- `redis-1st` 모듈의 `test`에 .http, loadTest.js 파일이 위치합니다.
 
 ### ✔️ 모듈 역할
 `헥사고날 아키텍처`를 기반으로 한 멀티모듈 구성
@@ -143,7 +144,7 @@ Hibernate:
 
 ### 부하 테스트 결과
 
-![img_3.png](img_3.png)
+![img_3.png](doc/img_3.png)
 - **평균 응답 시간:** `7.14s`
 - **p(95) 응답 시간:** `14.28s` (목표 `200ms` 초과 ❌)
 - **실패율 (`http_req_failed`):** `0.00%`
@@ -216,7 +217,7 @@ Hibernate:
   - 기본 키(`PRIMARY KEY`)를 사용한 **`eq_ref` 조인 방식** 적용
 
 ### 부하 테스트 결과
-![img.png](img.png)![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/bb93b802-d931-4b1d-8781-7610e83f6955/af3d1cac-8b23-4ae8-8378-fdb3fb92d6bf/image.png)
+![img.png](doc/img.png)![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/bb93b802-d931-4b1d-8781-7610e83f6955/af3d1cac-8b23-4ae8-8378-fdb3fb92d6bf/image.png)
 
 - **평균 응답 시간 (`http_req_duration`)**: `1.95s`
 - **p(95) 응답 시간**: `3.1s`
@@ -357,7 +358,7 @@ Hibernate:
 ### 부하 테스트 결과
 
 **⭕️ Like 연산자 사용**
-![img_1.png](img_1.png)
+![img_1.png](doc/img_1.png)
 - **평균 응답 시간 (`http_req_duration`)**: `1.24s` **(인덱스 적용 전과 비교했을 때 36.4% 감소 ✅)**
 - **p(95) 응답 시간**: `2.43s` **(21.6% 감소 ✅)**
 - **최대 응답 시간**: `5.25s` **(14.2% 감소 ✅)**
@@ -366,7 +367,7 @@ Hibernate:
 - **총 요청 수**: `1,134,866`
 
 **❌ Like 연산자 미사용**
-![img_2.png](img_2.png)
+![img_2.png](doc/img_2.png)
 - **평균 응답 시간 (`http_req_duration`)**: `1.93s` **(like 사용할 때 보다 증가 ⬆️)**
 - **p(95) 응답 시간**: `3.14s` **(증가 ⬆️)**
 - **최대 응답 시간**: `6.27s` **(증가 ⬆️)**
@@ -375,3 +376,22 @@ Hibernate:
 - **총 요청 수**: `871,069` **(감소 ⬇️)**
 
 
+# 4. 로컬 Caching 적용 후
+
+### 캐싱한 데이터의 종류
+- `title-genre` 조합에 해당하는 `List<MovieResponseDto>` 데이터를 캐싱
+- **Key:** `title` + `genre` → `"in-SCI_FI"` 같은 조합 (Query Parameter 기반)
+- **Value:** `List<MovieResponseDto>` (특정 제목과 장르에 해당하는 영화 목록)
+
+### 실행 계획
+- 3번 테스트 결과의 Like 연산자 + index 적용 실행 계획과 동일
+
+### 부하 테스트 결과
+![img.png](img.png)
+
+- **평균 응답 시간 (`http_req_duration`)**: `6.84ms` (**캐싱 적용 전보다 ⏬ 99.64% 감소**)
+- **p(95) 응답 시간**: `26.06ms` (**⏬ 99.2% 감소**)
+- **최대 응답 시간**: `370.18ms` (**⏬ 94.1% 감소**)
+- **실패율 (`http_req_failed`)**: `0.00%`
+- **초당 요청 처리량 (`RPS`)**: `4206.66 req/s` (**⏫ 190% 증가**)
+- **총 요청 수**: `2,525,659` (**⏫ 190% 증가**)

@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import {check, sleep} from 'k6';
 
 // 검색어 풀 (자주 검색되는 키워드 & 다양한 장르)
 const titles = ["in", "10", "20", "30", "40"];

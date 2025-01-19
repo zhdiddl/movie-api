@@ -15,8 +15,6 @@ import com.example.domain.model.entity.Theater;
 import com.example.domain.model.valueObject.Genre;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -29,13 +27,9 @@ public class MovieService implements MovieServicePort {
     private final ScreeningRepositoryPort screeningRepositoryPort;
     private final TheaterRepositoryPort theaterRepositoryPort;
 
-    private final Logger logger = LoggerFactory.getLogger(MovieService.class);
-
     @Cacheable(value = "movies", key = "#title + '-' + #genre")
     @Override
     public List<MovieResponseDto> findMovies(String title, Genre genre) {
-
-        logger.info("🔥 캐시 메서드 실행됨! title={}, genre={}", title, genre);
         Sort sort = Sort.by("releaseDate").descending();
 
         return movieRepositoryPort.findBy(title, genre, sort).stream()

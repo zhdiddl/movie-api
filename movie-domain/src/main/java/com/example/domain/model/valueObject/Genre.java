@@ -3,7 +3,6 @@ package com.example.domain.model.valueObject;
 import com.example.domain.exception.CustomException;
 import com.example.domain.exception.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -1,4 +1,4 @@
-package com.example.application.validation;
+package com.example.domain.validation;
 
 import com.example.domain.exception.CustomException;
 import com.example.domain.exception.ErrorCode;

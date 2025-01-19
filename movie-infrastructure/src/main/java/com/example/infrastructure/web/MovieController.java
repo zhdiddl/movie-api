@@ -4,7 +4,7 @@ import com.example.application.dto.request.MovieRequestDto;
 import com.example.application.dto.request.ScreeningRequestDto;
 import com.example.application.dto.response.MovieResponseDto;
 import com.example.application.port.in.MovieServicePort;
-import com.example.application.validation.MovieValidation;
+import com.example.domain.validation.MovieValidation;
 import com.example.domain.model.valueObject.Genre;
 import jakarta.validation.Valid;
 import java.util.List;

@@ -77,9 +77,10 @@ Seat (N) -> Theater (1)
 ---
 # 성능 테스트
 ## 1. 영화 목록 전체 조회 API
-### 쿼리
 
-```jsx
+### 쿼리
+- JPQL로 쿼리 작성, Entity Graph 적용
+```sql
 Hibernate: 
     select
         m1_0.id,
@@ -154,8 +155,8 @@ Hibernate:
 ## 2. 검색 기능이 추가된 API (Index 적용 전)
 
 ### 쿼리
-
-```jsx
+- QueryDSL로 쿼리 작성
+```sql
 Hibernate: 
     select
         m1_0.id,
@@ -217,8 +218,7 @@ Hibernate:
   - 기본 키(`PRIMARY KEY`)를 사용한 **`eq_ref` 조인 방식** 적용
 
 ### 부하 테스트 결과
-![img.png](doc/img.png)![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/bb93b802-d931-4b1d-8781-7610e83f6955/af3d1cac-8b23-4ae8-8378-fdb3fb92d6bf/image.png)
-
+![img.png](doc/img.png)
 - **평균 응답 시간 (`http_req_duration`)**: `1.95s`
 - **p(95) 응답 시간**: `3.1s`
 - **최대 응답 시간**: `6.12s`
@@ -237,8 +237,8 @@ CREATE INDEX idx_movie_title ON movie (title)
 
 ### 쿼리
 
-```jsx
--- like 연산자 사용
+**⭕️ Like 연산자 사용**
+```sql
 Hibernate: 
     select
         m1_0.id,
@@ -282,8 +282,11 @@ Hibernate:
         m1_0.release_date desc,
         s1_0.start_time
         
- -- like 연산자 미사용
- Hibernate: 
+```
+
+**❌ Like 연산자 미사용**
+``` sql
+Hibernate: 
     select
         m1_0.id,
         m1_0.content_rating,
@@ -378,13 +381,15 @@ Hibernate:
 
 # 4. 로컬 Caching 적용 후
 
+- Like 연산자 사용 + index 적용
+- 
 ### 캐싱한 데이터의 종류
 - `title-genre` 조합에 해당하는 `List<MovieResponseDto>` 데이터를 캐싱
 - **Key:** `title` + `genre` → `"in-SCI_FI"` 같은 조합 (Query Parameter 기반)
 - **Value:** `List<MovieResponseDto>` (특정 제목과 장르에 해당하는 영화 목록)
 
 ### 실행 계획
-- 3번 테스트 결과의 Like 연산자 + index 적용 실행 계획과 동일
+- 쿼리 실행 계획은 이전과 동일
 
 ### 부하 테스트 결과
 ![img.png](img.png)
@@ -395,3 +400,16 @@ Hibernate:
 - **실패율 (`http_req_failed`)**: `0.00%`
 - **초당 요청 처리량 (`RPS`)**: `4206.66 req/s` (**⏫ 190% 증가**)
 - **총 요청 수**: `2,525,659` (**⏫ 190% 증가**)
+# 5. 분산 Caching 적용 후
+
+- Caffeine에서 Redis로 변경
+- 캐싱한 데이터 종류, 실행 계획은 이전과 동일
+
+### 부하 테스트 결과
+![img_1.png](img_1.png)
+- **평균 응답 시간 (`http_req_duration`)**: `13.7ms` **(로컬 캐싱 적용 결과 보다는 느려짐 ⬇️)**
+- **p(95) 응답 시간**: `53.58ms`
+- **최대 응답 시간**: `733.1ms`
+- **실패율 (`http_req_failed`)**: `0.00%`
+- **초당 요청 처리량 (`RPS`)**: `4177.76 req/s`
+- **총 요청 수**: `2,510,158`

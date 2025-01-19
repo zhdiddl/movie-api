@@ -12,7 +12,6 @@ import com.example.domain.exception.ErrorCode;
 import com.example.domain.model.entity.Movie;
 import com.example.domain.model.entity.Screening;
 import com.example.domain.model.entity.Theater;
-import com.example.domain.model.projection.MovieProjection;
 import com.example.domain.model.valueObject.Genre;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class MovieService implements MovieServicePort {
         Sort sort = Sort.by("releaseDate").descending();
 
         return movieRepositoryPort.findBy(title, genre, sort).stream()
-                .map(MovieResponseDto::fromProjection)
+                .map(MovieResponseDto::fromEntity)
                 .toList();
     }
 

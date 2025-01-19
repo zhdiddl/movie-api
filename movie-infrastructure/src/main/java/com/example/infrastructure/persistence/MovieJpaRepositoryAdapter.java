@@ -2,9 +2,9 @@ package com.example.infrastructure.persistence;
 
 import com.example.application.port.out.MovieRepositoryPort;
 import com.example.domain.model.entity.Movie;
-import com.example.domain.model.projection.MovieProjection;
 import com.example.domain.model.valueObject.Genre;
 import com.example.infrastructure.db.MovieJpaRepository;
+import com.example.infrastructure.db.querydsl.MovieRepositoryCustomImpl;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,11 @@ import org.springframework.stereotype.Repository;
 public class MovieJpaRepositoryAdapter implements MovieRepositoryPort {
 
     private final MovieJpaRepository movieJpaRepository;
+    private final MovieRepositoryCustomImpl movieRepositoryCustom;
 
     @Override
-    public List<MovieProjection> findBy(String title, Genre genre, Sort sort) {
-        return movieJpaRepository.findByTitleContainingIgnoreCaseAndGenre(title, genre, sort);
+    public List<Movie> findBy(String title, Genre genre, Sort sort) {
+        return movieRepositoryCustom.findByFilters(title, genre, sort);
     }
 
     @Override

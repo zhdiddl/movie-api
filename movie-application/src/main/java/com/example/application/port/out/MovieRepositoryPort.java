@@ -1,7 +1,6 @@
 package com.example.application.port.out;
 
 import com.example.domain.model.entity.Movie;
-import com.example.domain.model.projection.MovieProjection;
 import com.example.domain.model.valueObject.Genre;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,7 @@ import org.springframework.data.domain.Sort;
  * (e.g., databases, external APIs).
  */
 public interface MovieRepositoryPort {
-    List<MovieProjection> findBy(String title, Genre genre, Sort sort);
+    List<Movie> findBy(String title, Genre genre, Sort sort);
     void save(Movie movie);
     Optional<Movie> findById(Long id);
 }

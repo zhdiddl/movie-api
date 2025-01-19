@@ -1,30 +1,33 @@
 package com.example.infrastructure.db.config;
 
-
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.concurrent.TimeUnit;
-import org.springframework.cache.CacheManager;
+import java.time.Duration;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@RequiredArgsConstructor
 @EnableCaching
 @Configuration
 public class CacheConfig {
 
+    /**
+     * Redis 기본 캐시 설정을 정의하는 메서드
+     * - 모든 Redis 캐시에 적용될 기본 설정을 정의
+     * - TTL(캐시 유효 시간): 60초로 설정
+     * - NULL 값 캐싱 방지
+     * - Key는 문자열(String), Value는 JSON으로 직렬화
+     */
     @Bean
-    public Caffeine<Object, Object> caffeineConfig() {
-        return Caffeine.newBuilder()
-                .expireAfterWrite(20, TimeUnit.MINUTES) // 20분 후 만료
-                .maximumSize(10000); // 최대 캐시 저장 개수
+    public RedisCacheConfiguration redisCacheConfiguration() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(20)) // 캐시 만료 시간
+                .disableCachingNullValues() // null 값 캐싱 방지
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new JdkSerializationRedisSerializer()));
     }
-
-    @Bean
-    public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(caffeine);
-        return cacheManager;
-    }
-
 }

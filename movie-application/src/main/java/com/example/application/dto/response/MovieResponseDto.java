@@ -2,6 +2,7 @@ package com.example.application.dto.response;
 
 import com.example.domain.model.entity.Movie;
 import com.example.domain.model.projection.MovieProjection;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +16,8 @@ public record MovieResponseDto(
         String genre,
         String theater,
         List<ScreeningResponseDto> screenings
-) {
+) implements Serializable {
+
     public static MovieResponseDto fromProjection(MovieProjection movie) {
         String theaterName = movie.getScreenings().stream()
                 .findFirst()  // 첫 번째 screening 에서 가져옴

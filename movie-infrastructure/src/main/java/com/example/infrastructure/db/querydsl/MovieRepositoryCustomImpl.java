@@ -1,5 +1,6 @@
 package com.example.infrastructure.db.querydsl;
 
+import com.example.application.dto.request.MovieSearchCriteria;
 import com.example.domain.model.entity.Movie;
 import com.example.domain.model.entity.QMovie;
 import com.example.domain.model.entity.QScreening;
@@ -25,10 +26,13 @@ public class MovieRepositoryCustomImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<Movie> findByFilters(String title, Genre genre, Sort sort) {
+    public List<Movie> findByFilters(MovieSearchCriteria movieSearchCriteria, Sort sort) {
         QMovie movie = QMovie.movie;
         QScreening screening = QScreening.screening;
         QTheater theater = QTheater.theater;
+
+        String title = movieSearchCriteria.title();
+        Genre genre = movieSearchCriteria.genre();
 
         // 동적 WHERE 조건 처리
         BooleanBuilder builder = new BooleanBuilder();

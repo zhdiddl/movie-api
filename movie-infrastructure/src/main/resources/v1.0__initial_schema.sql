@@ -46,3 +46,9 @@ CREATE TABLE seat (
                       modified_by VARCHAR(50) NOT NULL
 --                       CONSTRAINT FK_seat_theater FOREIGN KEY (theater_id) REFERENCES theater (id)
 );
+
+-- 인덱스 설정
+-- title 과 genre 로 검색 기능을 제공하기 때문에 복합 인덱스 설정
+CREATE INDEX idx_title_genre ON dev_database.movie (title, genre);
+-- screening 테이블의 풀 스캔을 막기 위해 movie_id에 인덱스 생성
+CREATE INDEX idx_screening_movie_id ON screening (movie_id);

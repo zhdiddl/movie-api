@@ -28,6 +28,7 @@ public class SeatReservation {
     @JoinColumn(nullable = false)
     private Screening screening;
 
+
     protected SeatReservation() {}
 
     private SeatReservation(Reservation reservation, Seat seat, Screening screening) {

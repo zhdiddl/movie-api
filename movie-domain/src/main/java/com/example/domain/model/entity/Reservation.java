@@ -33,6 +33,7 @@ public class Reservation extends AuditingFields {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SeatReservation> seatReservations = new ArrayList<>();
 
+
     protected Reservation() {}
 
     private Reservation(Screening screening, Member member) {

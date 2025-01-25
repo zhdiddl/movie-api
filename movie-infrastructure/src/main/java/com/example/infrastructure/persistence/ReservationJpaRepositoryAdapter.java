@@ -22,4 +22,9 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepositoryPor
     public Optional<Reservation> findById(Long id) {
         return reservationJpaRepository.findById(id);
     }
+
+    @Override
+    public void deleteAll() {
+        reservationJpaRepository.deleteAll();
+    }
 }

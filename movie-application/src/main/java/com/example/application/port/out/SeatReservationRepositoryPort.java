@@ -10,4 +10,6 @@ public interface SeatReservationRepositoryPort {
     int countByScreeningAndReservationMember(Screening screening, Member member);
     List<Seat> findReservedSeatsByScreening(Screening screening);
     void save(SeatReservation seatReservation);
+    void deleteAll();
+    long count();
 }

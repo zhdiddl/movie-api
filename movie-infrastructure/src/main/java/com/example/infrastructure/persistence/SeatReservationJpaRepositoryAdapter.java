@@ -31,4 +31,14 @@ public class SeatReservationJpaRepositoryAdapter implements SeatReservationRepos
         seatReservationJpaRepository.save(seatReservation);
     }
 
+    @Override
+    public void deleteAll() {
+        seatReservationJpaRepository.deleteAll();
+    }
+
+    @Override
+    public long count() {
+        return seatReservationJpaRepository.count();
+    }
+
 }

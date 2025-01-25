@@ -6,4 +6,5 @@ import java.util.Optional;
 public interface ReservationRepositoryPort {
     void save(Reservation reservation);
     Optional<Reservation> findById(Long id);
+    void deleteAll();
 }

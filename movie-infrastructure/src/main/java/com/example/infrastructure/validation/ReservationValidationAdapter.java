@@ -2,9 +2,7 @@ package com.example.infrastructure.validation;
 
 import com.example.application.port.out.ReservationValidationPort;
 import com.example.domain.model.entity.Seat;
-import com.example.domain.validation.MemberValidation;
 import com.example.domain.validation.ReservationValidation;
-import com.example.domain.validation.ScreeningValidation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,8 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReservationValidationAdapter implements ReservationValidationPort {
 
-    private final ScreeningValidation screeningValidation;
-    private final MemberValidation memberValidation;
     private final ReservationValidation reservationValidation;
 
     @Override

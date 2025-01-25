@@ -14,15 +14,15 @@ public class ReservationValidation {
 
     private static final int MAX_SEATS_PER_SCREENING = 5;
 
-    public void validateRequestedSeatsExisted(List<Long> requestedSeatIds, List<Seat> foundSeats) {
-        if (Objects.isNull(requestedSeatIds) || requestedSeatIds.isEmpty()) {
-            throw new CustomException(ErrorCode.INVALID_REQUEST, "좌석 ID 리스트가 null이거나 비어 있습니다.");
+    public void validateReservationRequest(Long screeningId, Long memberId, List<Long> seatIds) {
+        if (Objects.isNull(screeningId)) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "screeningId는 필수 값입니다.");
         }
-        if (Objects.isNull(foundSeats) || foundSeats.isEmpty()) {
-            throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
+        if (Objects.isNull(memberId)) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "memberId는 필수 값입니다.");
         }
-        if (foundSeats.size() != requestedSeatIds.size()) {
-            throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
+        if (Objects.isNull(seatIds) || seatIds.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "seatIds는 필수 값이며 최소 1개 이상의 좌석이 필요합니다.");
         }
     }
 

@@ -9,6 +9,8 @@ import com.example.application.port.out.ReservationValidationPort;
 import com.example.application.port.out.ScreeningRepositoryPort;
 import com.example.application.port.out.SeatRepositoryPort;
 import com.example.application.port.out.SeatReservationRepositoryPort;
+import com.example.domain.exception.CustomException;
+import com.example.domain.exception.ErrorCode;
 import com.example.domain.model.entity.Member;
 import com.example.domain.model.entity.Reservation;
 import com.example.domain.model.entity.Screening;
@@ -32,30 +34,24 @@ public class ReservationService implements ReservationServicePort {
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {
 
-        // 상영 정보 조회 및 검증
+        // 상영 정보 존재 여부 검증
         Screening screening = screeningRepositoryPort.findById(request.screeningId())
-                .orElse(null);
-        reservationValidationPort.validateScreening(screening);
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_SCREENING));
 
-        // 회원 정보 조회 및 검증
+        // 회원 정보 존재 여부 검증
         Member member = memberRepositoryPort.findById(request.memberId())
-                .orElse(null);
-        reservationValidationPort.validateMember(member);
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_MEMBER));
 
-        //  요청한 좌석 조회 및 검증
-        List<Long> requestedSeatIds = request.seatIds();
-        List<Seat> requestedSeats = seatRepositoryPort.findAllById(requestedSeatIds);
-        reservationValidationPort.validateRequestedSeatsExisted(requestedSeatIds, requestedSeats);
-
-        // 현재 사용자의 기존 예약 좌석 개수 조회 및 검증
+        // 현재 사용자의 총 예약 좌석 수 검증
         int existingReservations = seatReservationRepositoryPort.countByScreeningAndReservationMember(screening, member);
+        List<Seat> requestedSeats = seatRepositoryPort.findAllById(request.seatIds());
         reservationValidationPort.validateMaxSeatsPerScreening(existingReservations, requestedSeats.size());
 
-        // 현재 상영 시간대에서 요청한 좌석의 예약 여부 조회 및 검증
+        // 현재 상영 시간대의 예약 좌석 조회 후 요청한 좌석 예약 가능 여부 검증
         List<Seat> alreadyReservedSeats = seatReservationRepositoryPort.findReservedSeatsByScreening(screening);
         reservationValidationPort.validateSeatsAreAvailableForReservation(requestedSeats, alreadyReservedSeats);
 
-        // 요청한 좌석이 연속적으로 배치되었는지 검증
+        // 요청한 좌석이 연속 배치되었는지 검증
         reservationValidationPort.validateSeatsAreConsecutive(requestedSeats);
 
         // 예약 내역 생성
@@ -66,6 +62,7 @@ public class ReservationService implements ReservationServicePort {
         for (Seat seat : requestedSeats) {
             SeatReservation seatReservation = SeatReservation.of(reservation, seat, screening);
             seatReservationRepositoryPort.save(seatReservation);
+            reservation.getSeatReservations().add(seatReservation);
         }
 
         return ReservationResponseDto.fromEntity(reservation);

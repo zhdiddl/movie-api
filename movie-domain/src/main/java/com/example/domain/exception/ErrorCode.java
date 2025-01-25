@@ -23,6 +23,7 @@ public enum ErrorCode {
     SEAT_ALREADY_RESERVED("Some seats are already reserved.", 400),
     SEATS_NOT_CONSECUTIVE("Seats must be consecutive in the same row.", 400),
     DUPLICATE_SEAT_REQUEST("Duplicate seat reservations are not allowed.", 400),
+    INVALID_REQUEST("Invalid request.", 400),
     ;
 
     private final String message;

@@ -5,6 +5,7 @@ import com.example.domain.exception.ErrorCode;
 import com.example.domain.model.entity.Seat;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,12 @@ public class ReservationValidation {
     private static final int MAX_SEATS_PER_SCREENING = 5;
 
     public void validateRequestedSeatsExisted(List<Long> requestedSeatIds, List<Seat> foundSeats) {
+        if (Objects.isNull(requestedSeatIds) || requestedSeatIds.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "좌석 ID 리스트가 null이거나 비어 있습니다.");
+        }
+        if (Objects.isNull(foundSeats) || foundSeats.isEmpty()) {
+            throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
+        }
         if (foundSeats.size() != requestedSeatIds.size()) {
             throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
         }
@@ -26,6 +33,12 @@ public class ReservationValidation {
     }
 
     public void validateSeatsAreAvailableForReservation(List<Seat> requestedSeats, List<Seat> alreadyReservedSeats) {
+        if (Objects.isNull(requestedSeats) || requestedSeats.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "요청된 좌석 리스트가 null이거나 비어 있습니다.");
+        }
+        if (Objects.isNull(alreadyReservedSeats)) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "예약된 좌석 리스트가 null입니다.");
+        }
         for (Seat seat : requestedSeats) {
             if (alreadyReservedSeats.contains(seat)) {
                 throw new CustomException(ErrorCode.SEAT_ALREADY_RESERVED);
@@ -34,6 +47,10 @@ public class ReservationValidation {
     }
 
     public void validateSeatsAreConsecutive(List<Seat> seats) {
+        if (Objects.isNull(seats) || seats.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "요청된 좌석 리스트가 null이거나 비어 있습니다.");
+        }
+
         Map<Character, List<Integer>> rowGroupedSeats = seats.stream()
                 .collect(Collectors.groupingBy(
                         seat -> seat.getSeatNumber().getSeatRow(), // 좌석의 행으로 그룹화 (A, B, C, D, E)

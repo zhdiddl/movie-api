@@ -2,6 +2,7 @@ package com.example.application.service;
 
 import com.example.application.dto.request.ReservationRequestDto;
 import com.example.application.dto.response.ReservationResponseDto;
+import com.example.application.port.in.MessageServicePort;
 import com.example.application.port.in.ReservationServicePort;
 import com.example.application.port.out.MemberRepositoryPort;
 import com.example.application.port.out.ReservationRepositoryPort;
@@ -17,6 +18,7 @@ import com.example.domain.model.entity.Screening;
 import com.example.domain.model.entity.Seat;
 import com.example.domain.model.entity.SeatReservation;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class ReservationService implements ReservationServicePort {
     private final SeatRepositoryPort seatRepositoryPort;
     private final SeatReservationRepositoryPort seatReservationRepositoryPort;
     private final ReservationValidationPort reservationValidationPort;
+    private final MessageServicePort messageServicePort;
 
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {
@@ -65,7 +68,17 @@ public class ReservationService implements ReservationServicePort {
             reservation.getSeatReservations().add(seatReservation);
         }
 
+        // 예약 완료 후 알림 메시지 전송
+        sendReservationConfirmation(member, requestedSeats, screening);
+
         return ReservationResponseDto.fromEntity(reservation);
+    }
+
+    private void sendReservationConfirmation(Member member, List<Seat> requestedSeats, Screening screening) {
+        messageServicePort.send(String.format("[예약 완료] 사용자명: %s, 좌석: %s, 영화: %s, 상영관: %s, 시간: %s",
+                member.getName(),
+                requestedSeats.stream().map(seat -> seat.getSeatNumber().toString()).collect(Collectors.joining(", ")),
+                screening.getMovie().getTitle(), screening.getTheater().getName(), screening.getStartTime()));
     }
 
 }

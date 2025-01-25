@@ -11,13 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-/**
- * This adapter serves as a bridge between the application layer
- * and the database layer, allowing the application to access movie
- * data through the defined MovieRepositoryPort interface while
- * encapsulating the JPA-specific implementation details.
- */
-
 @RequiredArgsConstructor
 @Repository
 public class MovieJpaRepositoryAdapter implements MovieRepositoryPort {

@@ -47,6 +47,39 @@ CREATE TABLE seat (
 --                       CONSTRAINT FK_seat_theater FOREIGN KEY (theater_id) REFERENCES theater (id)
 );
 
+CREATE TABLE member (
+                        id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                        name        VARCHAR(50) NOT NULL,
+                        email       VARCHAR(100) NOT NULL UNIQUE,
+                        created_at  DATETIME(6) NOT NULL,
+                        created_by  VARCHAR(50) NOT NULL,
+                        modified_at DATETIME(6) NOT NULL,
+                        modified_by VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE reservation (
+                             id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                             screening_id INT UNSIGNED NOT NULL,
+                             member_id   INT UNSIGNED NOT NULL,
+                             created_at  DATETIME(6) NOT NULL,
+                             created_by  VARCHAR(50) NOT NULL,
+                             modified_at DATETIME(6) NOT NULL,
+                             modified_by VARCHAR(50) NOT NULL
+--                              CONSTRAINT FK_reservation_screening FOREIGN KEY (screening_id) REFERENCES screening(id) ON DELETE CASCADE,
+--                              CONSTRAINT FK_reservation_member FOREIGN KEY (member_id) REFERENCES member(id) ON DELETE CASCADE
+);
+
+CREATE TABLE seat_reservation (
+                                  id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                                  reservation_id INT UNSIGNED NOT NULL,
+                                  seat_id        INT UNSIGNED NOT NULL,
+                                  screening_id   INT UNSIGNED NOT NULL
+--                                 CONSTRAINT FK_seat_reservation_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE CASCADE,
+--                                 CONSTRAINT FK_seat_reservation_seat FOREIGN KEY (seat_id) REFERENCES seat(id) ON DELETE CASCADE,
+--                                 CONSTRAINT FK_seat_reservation_screening FOREIGN KEY (screening_id) REFERENCES screening(id) ON DELETE CASCADE
+);
+
+
 -- 인덱스 설정
 -- title 과 genre 로 검색 기능을 제공하기 때문에 복합 인덱스 설정
 CREATE INDEX idx_title_genre ON dev_database.movie (title, genre);

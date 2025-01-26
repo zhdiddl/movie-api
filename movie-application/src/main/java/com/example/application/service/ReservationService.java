@@ -38,33 +38,46 @@ public class ReservationService implements ReservationServicePort {
     @Transactional
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {
+        Screening screening = getScreening(request.screeningId());
+        Member member = getMember(request.memberId());
 
-        // 상영 정보 존재 여부 검증
-        Screening screening = screeningRepositoryPort.findById(request.screeningId())
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_SCREENING));
-
-        // 회원 정보 존재 여부 검증
-        Member member = memberRepositoryPort.findById(request.memberId())
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_MEMBER));
-
-        // 현재 사용자의 총 예약 좌석 수 검증
-        int existingReservations = seatReservationRepositoryPort.countByScreeningAndReservationMember(screening, member);
         List<Seat> requestedSeats = seatRepositoryPort.findAllById(request.seatIds());
-        reservationValidationPort.validateSeatsExist(request.seatIds(), requestedSeats);
+        validateReservationConstraints(screening, member, requestedSeats);
+
+        Reservation reservation = saveReservationAndSeats(screening, member, requestedSeats);
+        sendReservationConfirmation(member, requestedSeats, screening);
+
+        return ReservationResponseDto.fromEntity(reservation);
+    }
+
+    /** 상영 정보 조회 */
+    private Screening getScreening(Long screeningId) {
+        return screeningRepositoryPort.findById(screeningId)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_SCREENING));
+    }
+
+    /** 회원 정보 조회 */
+    private Member getMember(Long memberId) {
+        return memberRepositoryPort.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_MEMBER));
+    }
+
+    /** 예약 전 비즈니스 로직 기반으로 요청 값 검증 */
+    private void validateReservationConstraints(Screening screening, Member member, List<Seat> requestedSeats) {
+        int existingReservations = seatReservationRepositoryPort.countByScreeningAndReservationMember(screening, member);
+        reservationValidationPort.validateSeatsExist(requestedSeats.stream().map(Seat::getId).toList(), requestedSeats);
         reservationValidationPort.validateMaxSeatsPerScreening(existingReservations, requestedSeats.size());
 
-        // 현재 상영 시간대의 예약 좌석 조회 후 요청한 좌석 예약 가능 여부 검증
         List<Seat> alreadyReservedSeats = seatReservationRepositoryPort.findReservedSeatsByScreening(screening);
-        reservationValidationPort.validateSeatsAreAvailableForReservation(requestedSeats, alreadyReservedSeats);
-
-        // 요청한 좌석이 연속 배치되었는지 검증
         reservationValidationPort.validateSeatsAreConsecutive(requestedSeats);
+        reservationValidationPort.validateSeatsAreAvailableForReservation(requestedSeats, alreadyReservedSeats);
+    }
 
-        // 예약 내역 생성
+    /** 예약 및 좌석 저장 */
+    private Reservation saveReservationAndSeats(Screening screening, Member member, List<Seat> requestedSeats) {
         Reservation reservation = Reservation.create(screening, member);
         reservationRepositoryPort.save(reservation);
 
-        // 좌석 정보를 예약 내역에 저장
         for (Seat seat : requestedSeats) {
             // 좌석에 pessimistic lock 적용하면서 예약된 좌석인지 확인
             boolean alreadyReserved = seatReservationRepositoryPort.existsByScreeningAndSeat(screening, seat);
@@ -74,15 +87,12 @@ public class ReservationService implements ReservationServicePort {
 
             SeatReservation seatReservation = SeatReservation.of(reservation, seat, screening);
             seatReservationRepositoryPort.save(seatReservation);
-            reservation.getSeatReservations().add(seatReservation);
+            reservation.getSeatReservations().add(seatReservation); // 좌석 정보를 예약 내역에 저장
         }
-
-        // 예약 완료 후 알림 메시지 전송
-        sendReservationConfirmation(member, requestedSeats, screening);
-
-        return ReservationResponseDto.fromEntity(reservation);
+        return reservation;
     }
 
+    /** 예약 완료 후 알림 전송 */
     private void sendReservationConfirmation(Member member, List<Seat> requestedSeats, Screening screening) {
         messageServicePort.send(String.format("[예약 완료] 사용자명: %s, 좌석: %s, 영화: %s, 상영관: %s, 시간: %s",
                 member.getName(),

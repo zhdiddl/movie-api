@@ -7,4 +7,5 @@ public interface ReservationValidationPort {
     void validateMaxSeatsPerScreening(int existingReservations, int newSeatCount);
     void validateSeatsAreAvailableForReservation(List<Seat> requestedSeats, List<Seat> alreadyReservedSeats);
     void validateSeatsAreConsecutive(List<Seat> seats);
+    void validateSeatsExist(List<Long> seatIds, List<Seat> requestedSeats);
 }

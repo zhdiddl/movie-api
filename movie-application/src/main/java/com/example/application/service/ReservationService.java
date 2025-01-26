@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +35,7 @@ public class ReservationService implements ReservationServicePort {
     private final ReservationValidationPort reservationValidationPort;
     private final MessageServicePort messageServicePort;
 
+    @Transactional
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {
 
@@ -48,6 +50,7 @@ public class ReservationService implements ReservationServicePort {
         // 현재 사용자의 총 예약 좌석 수 검증
         int existingReservations = seatReservationRepositoryPort.countByScreeningAndReservationMember(screening, member);
         List<Seat> requestedSeats = seatRepositoryPort.findAllById(request.seatIds());
+        reservationValidationPort.validateSeatsExist(request.seatIds(), requestedSeats);
         reservationValidationPort.validateMaxSeatsPerScreening(existingReservations, requestedSeats.size());
 
         // 현재 상영 시간대의 예약 좌석 조회 후 요청한 좌석 예약 가능 여부 검증
@@ -63,6 +66,12 @@ public class ReservationService implements ReservationServicePort {
 
         // 좌석 정보를 예약 내역에 저장
         for (Seat seat : requestedSeats) {
+            // 좌석에 pessimistic lock 적용하면서 예약된 좌석인지 확인
+            boolean alreadyReserved = seatReservationRepositoryPort.existsByScreeningAndSeat(screening, seat);
+            if (alreadyReserved) {
+                throw new CustomException(ErrorCode.SEAT_ALREADY_RESERVED);
+            }
+
             SeatReservation seatReservation = SeatReservation.of(reservation, seat, screening);
             seatReservationRepositoryPort.save(seatReservation);
             reservation.getSeatReservations().add(seatReservation);

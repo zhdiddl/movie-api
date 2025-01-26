@@ -12,4 +12,5 @@ public interface SeatReservationRepositoryPort {
     void save(SeatReservation seatReservation);
     void deleteAll();
     long count();
+    boolean existsByScreeningAndSeat(Screening screening, Seat seat);
 }

@@ -41,4 +41,9 @@ public class SeatReservationJpaRepositoryAdapter implements SeatReservationRepos
         return seatReservationJpaRepository.count();
     }
 
+    @Override
+    public boolean existsByScreeningAndSeat(Screening screening, Seat seat) {
+        return seatReservationJpaRepository.existsByScreeningAndSeat(screening, seat);
+    }
+
 }

@@ -2,6 +2,7 @@ package com.example.domain.validation;
 
 import com.example.domain.exception.CustomException;
 import com.example.domain.exception.ErrorCode;
+import com.example.domain.model.entity.ScreeningSeat;
 import com.example.domain.model.entity.Seat;
 import java.util.List;
 import java.util.Map;
@@ -32,20 +33,6 @@ public class ReservationValidation {
         }
     }
 
-    public void validateSeatsAreAvailableForReservation(List<Seat> requestedSeats, List<Seat> alreadyReservedSeats) {
-        if (Objects.isNull(requestedSeats) || requestedSeats.isEmpty()) {
-            throw new CustomException(ErrorCode.INVALID_REQUEST, "요청된 좌석 리스트가 null이거나 비어 있습니다.");
-        }
-        if (Objects.isNull(alreadyReservedSeats)) {
-            throw new CustomException(ErrorCode.INVALID_REQUEST, "예약된 좌석 리스트가 null입니다.");
-        }
-        for (Seat seat : requestedSeats) {
-            if (alreadyReservedSeats.contains(seat)) {
-                throw new CustomException(ErrorCode.SEAT_ALREADY_RESERVED);
-            }
-        }
-    }
-
     public void validateSeatsAreConsecutive(List<Seat> seats) {
         if (Objects.isNull(seats) || seats.isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_REQUEST, "요청된 좌석 리스트가 null이거나 비어 있습니다.");
@@ -68,6 +55,12 @@ public class ReservationValidation {
             if (seatNumbers.get(i) + 1 != seatNumbers.get(i + 1)) { // 현재 좌석과 다음 좌석의 차이가 1인지 확인
                 throw new CustomException(ErrorCode.SEATS_NOT_CONSECUTIVE);
             }
+        }
+    }
+
+    public void validateSeatsExist(List<Long> requestedSeatIds, List<ScreeningSeat> foundSeats) {
+        if (foundSeats.size() != requestedSeatIds.size()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "요청한 좌석 정보가 유효하지 않습니다.");
         }
     }
 

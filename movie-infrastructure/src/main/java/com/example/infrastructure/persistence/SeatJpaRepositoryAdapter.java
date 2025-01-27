@@ -13,9 +13,9 @@ public class SeatJpaRepositoryAdapter implements SeatRepositoryPort {
 
     private final SeatJpaRepository seatJpaRepository;
 
-    @Override
-    public List<Seat> findAllById(List<Long> ids) {
-        return seatJpaRepository.findAllById(ids);
-    }
 
+    @Override
+    public List<Seat> findAll() {
+        return seatJpaRepository.findAll();
+    }
 }

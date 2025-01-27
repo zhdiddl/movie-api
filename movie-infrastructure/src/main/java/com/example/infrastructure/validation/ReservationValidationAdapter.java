@@ -1,8 +1,7 @@
 package com.example.infrastructure.validation;
 
 import com.example.application.port.out.ReservationValidationPort;
-import com.example.domain.exception.CustomException;
-import com.example.domain.exception.ErrorCode;
+import com.example.domain.model.entity.ScreeningSeat;
 import com.example.domain.model.entity.Seat;
 import com.example.domain.validation.ReservationValidation;
 import java.util.List;
@@ -26,16 +25,8 @@ public class ReservationValidationAdapter implements ReservationValidationPort {
     }
 
     @Override
-    public void validateSeatsExist(List<Long> seatIds, List<Seat> requestedSeats) {
-        if (requestedSeats.size() != seatIds.size()) {
-            throw new CustomException(ErrorCode.INVALID_SEAT_NUMBER);
-        }
+    public void validateSeatsExist(List<Long> requestedSeatIds, List<ScreeningSeat> foundSeats) {
+        reservationValidation.validateSeatsExist(requestedSeatIds, foundSeats);
     }
-
-    @Override
-    public void validateSeatsAreAvailableForReservation(List<Seat> requestedSeats, List<Seat> alreadyReservedSeats) {
-        reservationValidation.validateSeatsAreAvailableForReservation(requestedSeats, alreadyReservedSeats);
-    }
-
 
 }

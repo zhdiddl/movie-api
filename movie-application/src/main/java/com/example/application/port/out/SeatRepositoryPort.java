@@ -4,5 +4,5 @@ import com.example.domain.model.entity.Seat;
 import java.util.List;
 
 public interface SeatRepositoryPort {
-    List<Seat> findAllById(List<Long> ids);
+    List<Seat> findAll();
 }

@@ -1,7 +1,9 @@
 package com.example.infrastructure.persistence;
 
 import com.example.application.port.out.ReservationRepositoryPort;
+import com.example.domain.model.entity.Member;
 import com.example.domain.model.entity.Reservation;
+import com.example.domain.model.entity.Screening;
 import com.example.infrastructure.db.ReservationJpaRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +28,10 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepositoryPor
     @Override
     public void deleteAll() {
         reservationJpaRepository.deleteAll();
+    }
+
+    @Override
+    public int countByScreeningAndMember(Screening screening, Member member) {
+        return reservationJpaRepository.countByScreeningAndMember(screening, member);
     }
 }

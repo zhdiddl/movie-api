@@ -29,8 +29,8 @@ public class Reservation extends AuditingFields {
     @JoinColumn(nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SeatReservation> seatReservations = new ArrayList<>();
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
+    private List<ReservedSeat> reservedSeats = new ArrayList<>();
 
 
     protected Reservation() {}
@@ -42,6 +42,10 @@ public class Reservation extends AuditingFields {
 
     public static Reservation create(Screening screening, Member member) {
         return new Reservation(screening, member);
+    }
+
+    public void addReservedSeats(List<ReservedSeat> seats) {
+        this.reservedSeats.addAll(seats);
     }
 
 }

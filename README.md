@@ -55,20 +55,29 @@ redis-1st
 
 
 # 테이블 디자인
-- `Movie` (영화): 영화의 기본 정보 저장
-- `Theater` (상영관): 상영관 정보를 관리
-- `Screening` (상영 정보): movie_id, theater_id를 각각 외래키로 참조하며 영화와 상영관을 연결
-- `Seat` (좌석 정보): theater_id를 외래키로 참조하여 각 상영관의 좌석 정보 저장
-    - `SeatNumber`를 Embedded 타입으로 구성해 좌석 번호 관련 로직을 분리 
-- `ContentRating` (상영 등급)을 Enum 으로 작성해 잘못된 값 입력을 방지
-- 모든 엔티티는 `AuditingFields` 를 상속해 createdBy, createdAt, modifiedBy, modifiedAt 정보를 관리
+- members:	회원 정보를 저장 (이름, 이메일 등)
+- movies:	영화 기본 정보를 저장 (제목, 장르, 개봉일 등)
+- theaters:	상영관 정보를 저장 (상영관 이름)
+- screenings:	특정 영화가 특정 상영관에서 언제 상영되는지 저장 (시작 시간, 종료 시간)
+- seats:	각 극장의 좌석 정보를 저장 (총 25개 좌석)
+- screeningSeat:	특정 상영 시간의 좌석을 관리하고 예약 여부를 체크
+- reservation:	회원이 특정 상영 시간에 대해 예약한 정보를 저장
+- reservedSeat:	예약(reservation)과 상영 좌석(screeningSeat)을 연결하는 N:M 관계 테이블
 
 ### ️✔️️ 테이블 관계 설정
-```
-Screening (N) <-> Movie (1)
-Screening (N) -> Theater (1)
-Seat (N) -> Theater (1)
-```
+
+| 관계 | 설명 |
+|------|------|
+| `Screening (N) -> Movie (1)` | 하나의 영화(Movie)는 여러 상영(Screening)에서 사용될 수 있음. |
+| `Screening (N) -> Theater (1)` | 하나의 극장(Theater)에서는 여러 상영(Screening)이 이루어질 수 있음. |
+| `Seat (N) -> Theater (1)` | 하나의 극장(Theater)에는 여러 좌석(Seat)이 존재함. |
+| `Reservation (N) -> Screening (1)` | 하나의 상영(Screening)에 대해 여러 개의 예약(Reservation)이 발생할 수 있음. |
+| `Reservation (N) -> Member (1)` | 하나의 회원(Member)은 여러 개의 예약(Reservation)을 가질 수 있음. |
+| `ScreeningSeat (N) -> Screening (1)` | 하나의 상영(Screening)은 여러 좌석(ScreeningSeat)과 연결됨. |
+| `ScreeningSeat (N) -> Seat (1)` | 하나의 좌석(Seat)은 여러 상영(ScreeningSeat)에 포함될 수 있음. |
+| `ReservedSeat (N) -> Reservation (1)` | 하나의 예약(Reservation)에는 여러 좌석(ReservedSeat)이 포함될 수 있음. |
+| `ReservedSeat (N) -> ScreeningSeat (1)` | 하나의 좌석(ScreeningSeat)은 여러 예약(ReservedSeat)에서 사용될 수 있음. |
+
 
 ### ✔️ 데이터 설정
 - `v1.0__initial_schema.sql`로 DB 스키마를 정의

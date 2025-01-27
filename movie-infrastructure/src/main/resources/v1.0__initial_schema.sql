@@ -57,6 +57,7 @@ CREATE TABLE member (
                         modified_by VARCHAR(50) NOT NULL
 );
 
+-- 예약 생성 시 변경이 발생하는 테이블
 CREATE TABLE reservation (
                              id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                              screening_id INT UNSIGNED NOT NULL,
@@ -69,19 +70,20 @@ CREATE TABLE reservation (
 --                              CONSTRAINT FK_reservation_member FOREIGN KEY (member_id) REFERENCES member(id) ON DELETE CASCADE
 );
 
-CREATE TABLE seat_reservation (
-                                  id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                                  reservation_id INT UNSIGNED NOT NULL,
-                                  seat_id        INT UNSIGNED NOT NULL,
-                                  screening_id   INT UNSIGNED NOT NULL
---                                 CONSTRAINT FK_seat_reservation_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE CASCADE,
---                                 CONSTRAINT FK_seat_reservation_seat FOREIGN KEY (seat_id) REFERENCES seat(id) ON DELETE CASCADE,
---                                 CONSTRAINT FK_seat_reservation_screening FOREIGN KEY (screening_id) REFERENCES screening(id) ON DELETE CASCADE
+CREATE TABLE reserved_seat (
+                               id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                               reservation_id      INT UNSIGNED NOT NULL,
+                               screening_seat_id   INT UNSIGNED NOT NULL
+--                               CONSTRAINT FK_reserved_seat_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE CASCADE,
+--                               CONSTRAINT FK_reserved_seat_screening_seat FOREIGN KEY (screening_seat_id) REFERENCES screening_seat(id) ON DELETE CASCADE
 );
 
-
--- 인덱스 설정
--- title 과 genre 로 검색 기능을 제공하기 때문에 복합 인덱스 설정
-CREATE INDEX idx_title_genre ON dev_database.movie (title, genre);
--- screening 테이블의 풀 스캔을 막기 위해 movie_id에 인덱스 생성
-CREATE INDEX idx_screening_movie_id ON screening (movie_id);
+CREATE TABLE screening_seat (
+                                id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                                screening_id INT UNSIGNED NOT NULL,
+                                seat_id      INT UNSIGNED NOT NULL,
+                                reserved     BOOLEAN NOT NULL DEFAULT FALSE, -- 좌석 예약 여부
+                                version      INT UNSIGNED NOT NULL DEFAULT 0 -- 낙관적 락 적용
+--                                CONSTRAINT FK_screening_seat_screening FOREIGN KEY (screening_id) REFERENCES screening(id) ON DELETE CASCADE,
+--                                CONSTRAINT FK_screening_seat_seat FOREIGN KEY (seat_id) REFERENCES seat(id) ON DELETE CASCADE,
+);

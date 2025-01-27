@@ -2,6 +2,7 @@ package com.example.application.service;
 
 import com.example.application.dto.request.ReservationRequestDto;
 import com.example.application.dto.response.ReservationResponseDto;
+import com.example.application.lock.DistributedLock;
 import com.example.application.port.in.MessageServicePort;
 import com.example.application.port.in.ReservationServicePort;
 import com.example.application.port.out.MemberRepositoryPort;
@@ -38,6 +39,7 @@ public class ReservationService implements ReservationServicePort {
 
     private final MessageServicePort messageServicePort;
 
+    @DistributedLock(key = "'seat_reservation:' + #request.screeningId + ':' + #request.seatIds.toString()")
     @Transactional
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {

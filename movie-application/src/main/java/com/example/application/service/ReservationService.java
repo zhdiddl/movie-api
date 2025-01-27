@@ -2,7 +2,7 @@ package com.example.application.service;
 
 import com.example.application.dto.request.ReservationRequestDto;
 import com.example.application.dto.response.ReservationResponseDto;
-import com.example.application.lock.DistributedLock;
+import com.example.application.lock.DistributedLockExecutor;
 import com.example.application.port.in.MessageServicePort;
 import com.example.application.port.in.ReservationServicePort;
 import com.example.application.port.out.MemberRepositoryPort;
@@ -20,11 +20,15 @@ import com.example.domain.model.entity.Screening;
 import com.example.domain.model.entity.ScreeningSeat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ReservationService implements ReservationServicePort {
@@ -38,8 +42,8 @@ public class ReservationService implements ReservationServicePort {
     private final ReservationValidationPort reservationValidationPort;
 
     private final MessageServicePort messageServicePort;
+    private final DistributedLockExecutor distributedLockExecutor;
 
-    @DistributedLock(key = "'seat_reservation:' + #request.screeningId + ':' + #request.seatIds.toString()")
     @Transactional
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {
@@ -48,10 +52,21 @@ public class ReservationService implements ReservationServicePort {
 
         List<ScreeningSeat> requestedSeats = validateReservationConstraints(screening, member, request.seatIds());
 
-        Reservation reservation = saveReservationAndSeats(screening, member, requestedSeats);
-        sendReservationConfirmation(member, requestedSeats, screening);
+        // 함수형 분산 락을 특정 메서드에 적용
+        String lockKey = "seat_reservation:" + request.screeningId() + ":" + request.seatIds();
+        long waitTime = 2000;
+        long leaseTime = 1000;
 
-        return ReservationResponseDto.fromEntity(reservation);
+        try {
+            return distributedLockExecutor.executeWithLock(lockKey, waitTime, leaseTime,
+                    () -> {
+                        Reservation reservation = saveReservationAndSeats(screening, member, requestedSeats);
+                        return ReservationResponseDto.fromEntity(reservation);
+                    });
+        } catch (LockAcquisitionException e) {
+            log.warn("[락 실패] 좌석 예약에 대한 락을 획득하지 못함 - Key: {}", lockKey);
+            throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED, "좌석 예약 요청이 많아 처리가 지연되었습니다. 다시 시도해주세요.");
+        }
     }
 
     /** 상영 정보 조회 */
@@ -112,4 +127,5 @@ public class ReservationService implements ReservationServicePort {
                 requestedSeats.stream().map(ss -> ss.getSeat().getSeatNumber().toString()).collect(Collectors.joining(", ")),
                 screening.getMovie().getTitle(), screening.getTheater().getName(), screening.getStartTime()));
     }
+
 }

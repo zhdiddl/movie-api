@@ -458,7 +458,7 @@ Hibernate:
 
 # 예약 생성 API 추가
 ## 1. AOP 분산 락 적용 후
-![img_aop.png](doc/img_aop.png)
+![img.png](doc/img_aop.png)
 
 - 트랜잭션 실행 시간이 500ms ~ 750ms 으로 관찰됨
     - 이를 기반으로 leaseTime(잠금 유지 시간)을 실행 시간의 약 2배
@@ -467,3 +467,5 @@ Hibernate:
 - ✅ leaseTime 1초 + waitTime 2초 설정으로 변경: 평균 응답시간 `7.79초`로 감소
 
 ## 2. 함수형 분산 락 적용 후
+![img.png](doc/img_functional.png)
+- 함수형 적용 후 평균 응답 시간(http_req_duration)이 AOP보다 약 20% 개선

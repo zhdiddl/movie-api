@@ -24,6 +24,8 @@ public enum ErrorCode {
     SEATS_NOT_CONSECUTIVE("Seats must be consecutive in the same row.", 400),
     DUPLICATE_SEAT_REQUEST("Duplicate seat reservations are not allowed.", 400),
     INVALID_REQUEST("Invalid request.", 400),
+
+    LOCK_ACQUISITION_FAILED("Lock acquisition failed.", 400),
     ;
 
     private final String message;

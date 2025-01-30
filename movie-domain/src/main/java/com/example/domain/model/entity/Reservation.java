@@ -40,7 +40,7 @@ public class Reservation extends AuditingFields {
         this.member = member;
     }
 
-    public static Reservation create(Screening screening, Member member) {
+    public static Reservation of(Screening screening, Member member) {
         return new Reservation(screening, member);
     }
 

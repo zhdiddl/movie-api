@@ -34,4 +34,5 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepositoryPor
     public int countByScreeningAndMember(Screening screening, Member member) {
         return reservationJpaRepository.countByScreeningAndMember(screening, member);
     }
+
 }

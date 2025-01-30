@@ -14,8 +14,8 @@ public class ReservedSeatJpaRepositoryAdapter implements ReservedSeatRepositoryP
     private final ReservedSeatJpaRepository reservedSeatJpaRepository;
 
     @Override
-    public void saveAll(List<ReservedSeat> reservedSeats) {
-        reservedSeatJpaRepository.saveAll(reservedSeats);
+    public void saveAll(List<ReservedSeat> reservedSeat) {
+        reservedSeatJpaRepository.saveAll(reservedSeat);
     }
 
 }

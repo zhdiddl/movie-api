@@ -1,15 +1,18 @@
 package com.example.infrastructure;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.example.application.dto.request.ReservationRequestDto;
 import com.example.application.port.in.ReservationServicePort;
 import com.example.application.port.out.ReservationRepositoryPort;
 import com.example.application.port.out.ScreeningSeatRepositoryPort;
+import com.example.domain.exception.CustomException;
+import com.example.domain.exception.ErrorCode;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,9 +41,9 @@ class ReservationConcurrencyTest {
         screeningSeatRepositoryPort.resetAllReservations();
     }
 
-    @DisplayName("100개 스레드가 동일한 좌석을 동시에 예약할 때 중복 예약이 발생하지 않는다.")
+    @DisplayName("여러 스레드에서 동시에 동일한 좌석을 예약 시 중복 예약이 발생하지 않는다.")
     @Test
-    void shouldPreventConcurrentSeatReservation() throws InterruptedException {
+    void givenMultipleThreads_whenReservingSeatsConcurrently_thenShouldPreventDuplicateReservations() throws InterruptedException {
         // given: 100개의 동시 예약 요청 설정
         int threadCount = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -48,7 +51,7 @@ class ReservationConcurrencyTest {
 
         Runnable reservationTask = () -> {
             try {
-                Long memberId = (Thread.currentThread().threadId() % 100) + 1;
+                Long memberId = Thread.currentThread().threadId();
                 ReservationRequestDto request = new ReservationRequestDto(screeningId, memberId, seatIds);
                 reservationServicePort.create(request);
             } catch (Exception e) {
@@ -58,7 +61,7 @@ class ReservationConcurrencyTest {
             }
         };
 
-        // when: 100개의 스레드가 동시에 좌석 예약 요청을 보냄
+        // when: 모든 스레드가 동시에 좌석 예약 요청을 보냄
         for (int i = 0; i < threadCount; i++) {
             executorService.execute(reservationTask);
         }
@@ -70,7 +73,9 @@ class ReservationConcurrencyTest {
         long reservedSeatsCount = screeningSeatRepositoryPort.countReservedSeats(screeningId);
         System.out.println("✅ 최종 예약된 좌석 개수: " + reservedSeatsCount);
 
-        assertEquals(seatIds.size(), reservedSeatsCount, "동시성 이슈 발생으로 좌석이 중복 예약됨!");
+        assertThat(reservedSeatsCount)
+                .as("동시성 이슈 발생으로 좌석이 중복 예약됨!")
+                .isEqualTo(seatIds.size());
     }
 
 }

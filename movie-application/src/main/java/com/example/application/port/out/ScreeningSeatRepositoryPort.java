@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ScreeningSeatRepositoryPort {
     List<ScreeningSeat> findByScreeningAndSeatIds(Screening screening, List<Long> seatIds);
-    void save(ScreeningSeat screeningSeat);
+    void saveAndFlush(ScreeningSeat screeningSeat);
     long count();
     void resetAllReservations();
     long countReservedSeats(Long screeningId);

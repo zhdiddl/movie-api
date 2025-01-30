@@ -20,13 +20,12 @@ import com.example.domain.model.entity.Screening;
 import com.example.domain.model.entity.ScreeningSeat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.LockAcquisitionException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,8 +42,8 @@ public class ReservationService implements ReservationServicePort {
 
     private final MessageServicePort messageServicePort;
     private final DistributedLockExecutor distributedLockExecutor;
+    private final TransactionTemplate transactionTemplate;
 
-    @Transactional
     @Override
     public ReservationResponseDto create(ReservationRequestDto request) {
         Screening screening = getScreening(request.screeningId());
@@ -53,20 +52,33 @@ public class ReservationService implements ReservationServicePort {
         List<ScreeningSeat> requestedSeats = validateReservationConstraints(screening, member, request.seatIds());
 
         // 함수형 분산 락을 특정 메서드에 적용
-        String lockKey = "seat_reservation:" + request.screeningId() + ":" + request.seatIds();
-        long waitTime = 2000;
-        long leaseTime = 1000;
+        String lockKey = "seat_reservation:" + request.screeningId();
+        long waitTime = 5_000; // 락 획득까지 대기할 시간
+        long leaseTime = 5_000; // STW 발생 시 대기를 고려해 충분한 시간으로 설정
 
+        Reservation reservation = null;
         try {
-            return distributedLockExecutor.executeWithLock(lockKey, waitTime, leaseTime,
-                    () -> {
-                        Reservation reservation = saveReservationAndSeats(screening, member, requestedSeats);
-                        return ReservationResponseDto.fromEntity(reservation);
-                    });
-        } catch (LockAcquisitionException e) {
-            log.warn("[락 실패] 좌석 예약에 대한 락을 획득하지 못함 - Key: {}", lockKey);
-            throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED, "좌석 예약 요청이 많아 처리가 지연되었습니다. 다시 시도해주세요.");
+            reservation = distributedLockExecutor.executeWithLock(lockKey, waitTime, leaseTime,
+                    () -> transactionTemplate.execute(status ->
+                    saveReservationAndSeats(screening, member, requestedSeats)
+                    )
+            );
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("[낙관락 예외 발생] 좌석 예약 실패 - 사용자 {}, {}", member.getId(), e.getMessage());
         }
+
+        // 예약 실패 시 예외 처리
+        if (reservation == null) {
+            throw new CustomException(ErrorCode.RESERVATION_REQUEST_FAILED);
+        }
+
+        // 예약 성공 시 알림 전송
+        sendReservationConfirmation(reservation.getMember(), requestedSeats, screening);
+        log.info("[예약 성공] 사용자명: {}, 좌석: {}", reservation.getMember().getName(),
+                reservation.getReservedSeats().stream()
+                        .map(reservedSeat -> reservedSeat.getScreeningSeat().getSeat().getSeatNumber().toString())
+                        .collect(Collectors.joining(",")));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     /** 상영 정보 조회 */
@@ -101,7 +113,7 @@ public class ReservationService implements ReservationServicePort {
 
     /** 예약 및 좌석 저장 */
     private Reservation saveReservationAndSeats(Screening screening, Member member, List<ScreeningSeat> requestedSeats) {
-        Reservation reservation = Reservation.create(screening, member);
+        Reservation reservation = Reservation.of(screening, member);
         reservationRepositoryPort.save(reservation);
 
         List<ReservedSeat> reservedSeats = new ArrayList<>();
@@ -109,7 +121,7 @@ public class ReservationService implements ReservationServicePort {
         for (ScreeningSeat screeningSeat : requestedSeats) {
             // 좌석에 Optimistic Lock 적용하면서 예약된 좌석인지 확인
             screeningSeat.reserve(); // 좌석을 예약 상태로 변경
-            screeningSeatRepositoryPort.save(screeningSeat); // 버전 변경 유도
+            screeningSeatRepositoryPort.saveAndFlush(screeningSeat); // 버전 변경 유도
             ReservedSeat reservedSeat = ReservedSeat.of(reservation, screeningSeat);
             reservedSeats.add(reservedSeat);
         }

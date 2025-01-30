@@ -21,8 +21,8 @@ public class ScreeningSeatJpaRepositoryAdapter implements ScreeningSeatRepositor
     }
 
     @Override
-    public void save(ScreeningSeat screeningSeat) {
-        screeningSeatJpaRepository.save(screeningSeat);
+    public void saveAndFlush(ScreeningSeat screeningSeat) {
+        screeningSeatJpaRepository.saveAndFlush(screeningSeat);
     }
 
     @Override

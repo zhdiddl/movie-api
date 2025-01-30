@@ -16,13 +16,13 @@ public class ReservationValidation {
     private static final int MAX_SEATS_PER_SCREENING = 5;
 
     public void validateReservationRequest(Long screeningId, Long memberId, List<Long> seatIds) {
-        if (Objects.isNull(screeningId)) {
+        if (screeningId == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST, "screeningId는 필수 값입니다.");
         }
-        if (Objects.isNull(memberId)) {
+        if (memberId == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST, "memberId는 필수 값입니다.");
         }
-        if (Objects.isNull(seatIds) || seatIds.isEmpty()) {
+        if (seatIds == null || seatIds.isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_REQUEST, "seatIds는 필수 값이며 최소 1개 이상의 좌석이 필요합니다.");
         }
     }
@@ -34,7 +34,7 @@ public class ReservationValidation {
     }
 
     public void validateSeatsAreConsecutive(List<Seat> seats) {
-        if (Objects.isNull(seats) || seats.isEmpty()) {
+        if (seats == null || seats.isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_REQUEST, "요청된 좌석 리스트가 null이거나 비어 있습니다.");
         }
 

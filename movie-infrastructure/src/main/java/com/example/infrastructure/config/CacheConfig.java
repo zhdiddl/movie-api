@@ -1,4 +1,4 @@
-package com.example.infrastructure.db.config;
+package com.example.infrastructure.config;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

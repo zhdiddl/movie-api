@@ -6,7 +6,6 @@ import com.example.domain.model.entity.ScreeningSeat;
 import com.example.domain.model.entity.Seat;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.example.infrastructure.persistence;
+package com.example.infrastructure.db.persistence;
 
 import com.example.application.port.out.ScreeningRepositoryPort;
 import com.example.domain.model.entity.Screening;

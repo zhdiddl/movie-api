@@ -1,4 +1,4 @@
-package com.example.infrastructure.validation;
+package com.example.application.adapter;
 
 import com.example.application.port.out.ReservationValidationPort;
 import com.example.domain.model.entity.ScreeningSeat;

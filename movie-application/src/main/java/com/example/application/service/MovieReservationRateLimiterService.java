@@ -1,10 +1,9 @@
 package com.example.application.service;
 
 import com.google.common.util.concurrent.RateLimiter;
-import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MovieReservationRateLimiterService {

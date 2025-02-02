@@ -1,4 +1,4 @@
-package com.example.infrastructure.persistence;
+package com.example.infrastructure.db.persistence;
 
 import com.example.application.port.out.ReservedSeatRepositoryPort;
 import com.example.domain.model.entity.ReservedSeat;

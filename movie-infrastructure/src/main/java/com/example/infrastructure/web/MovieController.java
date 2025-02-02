@@ -5,7 +5,11 @@ import com.example.application.dto.request.MovieSearchCriteria;
 import com.example.application.dto.request.ScreeningRequestDto;
 import com.example.application.dto.response.MovieResponseDto;
 import com.example.application.port.in.MovieServicePort;
+import com.example.application.service.MovieSearchRateLimiterService;
+import com.example.domain.exception.CustomException;
+import com.example.domain.exception.ErrorCode;
 import com.example.domain.validation.MovieValidation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +30,18 @@ public class MovieController {
 
     private final MovieServicePort movieServicePort;
     private final MovieValidation movieValidation;
+    private final MovieSearchRateLimiterService movieSearchRateLimiterService;
 
     @GetMapping
     public ResponseEntity<List<MovieResponseDto>> getMovies(
-            @ModelAttribute MovieSearchCriteria criteria
+            @ModelAttribute MovieSearchCriteria criteria,
+            HttpServletRequest request
     ) {
+        String clientIp = request.getRemoteAddr();
+        if (!movieSearchRateLimiterService.isAllowed(clientIp)) {
+            throw new CustomException(ErrorCode.RATE_LIMIT_EXCEED);
+        }
+
         movieValidation.validateTitleLength(criteria.title());
 
         List<MovieResponseDto> movies = movieServicePort.findMovies(criteria);

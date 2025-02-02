@@ -25,7 +25,11 @@ public enum ErrorCode {
 
     // 동시성 제어 관련 에러
     OPTIMISTIC_LOCK_CONFLICT("Optimistic lock conflict. Please try again.", 409),
-    DISTRIBUTED_LOCK_FAILURE("Distributed lock acquisition failed. Please try again.", 423)
+    DISTRIBUTED_LOCK_FAILURE("Distributed lock acquisition failed. Please try again.", 423),
+
+    // RateLimiter 관련 에러
+    RATE_LIMIT_EXCEED("Requests are limited to 50 times per minute. Please try again.", 429),
+    TOO_MANY_RESERVATIONS("Reservation for the same movie at the same screening time can only be made once every 5 minutes. Please try again.", 429),
     ;
 
     private final String message;

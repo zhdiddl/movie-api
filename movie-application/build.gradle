@@ -9,4 +9,7 @@ dependencies {
 
     // Redis AOP 기반 분산 락 구현시 애노테이션 사용을 위해 추가
     implementation 'org.redisson:redisson-spring-boot-starter:3.22.0'
+
+    // google guava ratelimiter 사용을 위해 추가
+    implementation 'com.google.guava:guava:32.1.2-jre'
 }

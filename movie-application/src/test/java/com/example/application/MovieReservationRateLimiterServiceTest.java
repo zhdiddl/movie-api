@@ -26,21 +26,24 @@ class MovieReservationRateLimiterServiceTest {
     private MovieReservationRateLimiterService movieReservationRateLimiterService;
 
     private Long screeningId;
+    private Long memberId;
+    private String key;
 
     @BeforeEach
     void setUp() {
         screeningId = 1L;
+        memberId = 5L;
+        key = "reservation:" + screeningId + ":" + memberId;
     }
 
     @DisplayName("첫 번째 요청은 허용되어야 한다.")
     @Test
     void givenFirstRequest_whenCheckingIfAllowed_thenReturnTrue() {
         // Given
-        String key = "reservation:" + screeningId;
         when(rateLimiterPort.isAllowed(key, 1, 300)).thenReturn(true);
 
         // When
-        boolean result = movieReservationRateLimiterService.isAllowed(screeningId);
+        boolean result = movieReservationRateLimiterService.isAllowed(screeningId, memberId);
 
         // Then
         assertTrue(result, "첫 번째 요청은 허용되어야 합니다.");
@@ -51,11 +54,10 @@ class MovieReservationRateLimiterServiceTest {
     @Test
     void givenSecondRequestWithinCooldown_whenCheckingIfAllowed_thenReturnFalse() {
         // Given
-        String key = "reservation:" + screeningId;
         when(rateLimiterPort.isAllowed(key, 1, 300)).thenReturn(false);
 
         // When
-        boolean result = movieReservationRateLimiterService.isAllowed(screeningId);
+        boolean result = movieReservationRateLimiterService.isAllowed(screeningId, memberId);
 
         // Then
         assertFalse(result, "5분 내 중복 요청은 차단되어야 합니다.");

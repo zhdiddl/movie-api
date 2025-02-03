@@ -16,14 +16,21 @@ public class RedisRateLimiterService implements RateLimiterPort {
     // Lua Script 실행을 위한 Redis Script 정의 (카운터 방식)
     // KEYS[1]: key, ARGV[1]: maxRequests, ARGV[2]: durationInSeconds
     private static final String RATE_LIMITER_LUA_SCRIPT =
-            "local current = redis.call('GET', KEYS[1]) " + // 해당 키에 저장된 값을 가져옴
-                    "if current and tonumber(current) > tonumber(ARGV[1]) then " + // 지금까지 요청 횟수 > 허용한 최대 요청 횟수
-                    "   return 0 " + // 비교가 참이면 요청 차단
-                    "else " +
-                    "   redis.call('INCR', KEYS[1]) " + // INCR 명령어로 요청 횟수를 1 증가
-                    "   redis.call('EXPIRE', KEYS[1], ARGV[2]) " + // ARGV[2]에 설정된 초가 지나가면 제한 해제하도록 TTL 설정
-                    "   return 1 " + // 요청 허용
-                    "end";
+            "local key = KEYS[1]; " +
+                    "local requests = tonumber(redis.call('GET', key) or '0'); " + // 요청 횟수 (기본 값 0)
+                    "local max_requests = tonumber(ARGV[1]); " + // 허용된 최대 요청 횟수
+                    "local expiry = tonumber(ARGV[2]); " + // 제한 시간 (초)
+
+                    "if requests >= max_requests then " +
+                    "    return 0; " + // 최대 요청 횟수를 초과하면 차단 (false)
+                    "end; " +
+
+                    "requests = redis.call('INCR', key); " + // 요청 횟수 증가
+                    "if requests == 1 then " +
+                    "redis.call('EXPIRE', key, expiry); " + // 최초 요청시에만 TTL 갱신
+                    "end; " +
+
+                    "return 1;"; // 요청 허용 (true)
 
     @Override
     public boolean isAllowed(String key, int maxRequests, int durationInSeconds) {

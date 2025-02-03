@@ -53,7 +53,7 @@ public class ReservationService implements ReservationServicePort {
 
         // 함수형 분산 락을 특정 메서드에 적용
         String lockKey = "seat_reservation:" + request.screeningId();
-        long waitTime = 5_000; // 락 획득까지 대기할 시간
+        long waitTime = 7_000; // 락 획득까지 대기할 시간
         long leaseTime = 5_000; // STW 발생 시 대기를 고려해 충분한 시간으로 설정
 
         Reservation reservation = null;

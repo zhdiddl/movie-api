@@ -25,7 +25,7 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponseDto> createReservation(@RequestBody ReservationRequestDto request) {
-        if (!movieReservationRateLimiterService.isAllowed(request.screeningId())) {
+        if (!movieReservationRateLimiterService.isAllowed(request.screeningId(), request.memberId())) {
             throw new CustomException(ErrorCode.TOO_MANY_RESERVATIONS);
         }
 

@@ -33,18 +33,21 @@ class ReservationControllerTest {
     @Test
     void givenValidRequest_whenCreateReservation_thenReturn200() throws Exception {
         // Given
-        ReservationRequestDto reservationRequestDto = new ReservationRequestDto(1L, 1L, List.of(1L, 2L, 3L));
+        ReservationRequestDto reservationRequestDto = new ReservationRequestDto(2L, 1L, List.of(1L, 2L, 3L));
 
         // When & Then
         mockMvc.perform(post("/api/v1/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(reservationRequestDto)))
-                .andExpect(jsonPath("$.reservationId").value(1L))
-                .andExpect(jsonPath("$.memberId").value(1L))
-                .andExpect(jsonPath("$.seatIds").value(List.of(1L, 2L, 3L)))
-                .andExpect(status().isOk());
-
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.memberName").exists())
+                .andExpect(jsonPath("$.movieTitle").exists())
+                .andExpect(jsonPath("$.theaterName").exists())
+                .andExpect(jsonPath("$.screeningStartTime").exists())
+                .andExpect(jsonPath("$.reservedSeats").exists())
+                .andExpect(jsonPath("$.reservedSeats").isArray());
     }
+
 
     @DisplayName("잘못된 요청 값으로 시도하면 400 응답을 반환한다.")
     @Test

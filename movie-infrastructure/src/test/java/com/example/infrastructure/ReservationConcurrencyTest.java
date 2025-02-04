@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@DisplayName("[통합 테스트] 예약 동시성 테스트")
 @SpringBootTest
 class ReservationConcurrencyTest {
 

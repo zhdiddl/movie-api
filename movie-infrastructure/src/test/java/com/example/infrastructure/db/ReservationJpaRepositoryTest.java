@@ -9,7 +9,6 @@ import com.example.domain.model.entity.Screening;
 import com.example.domain.model.entity.Theater;
 import com.example.domain.model.valueObject.ContentRating;
 import com.example.domain.model.valueObject.Genre;
-import com.example.infrastructure.config.RedisTestConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
@@ -21,9 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
-@Import(RedisTestConfig.class)
+@DisplayName("[JPA 테스트] 예약 리포지토리")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 DB에서 테스트
 @DataJpaTest
 class ReservationJpaRepositoryTest {
@@ -40,7 +38,6 @@ class ReservationJpaRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // Given
         member = Member.of("Test User", "testuser@email.net");
         Movie movie = Movie.of("Test Movie", ContentRating.ADULT, LocalDate.of(2024, 12, 25),
                 "http://test.com/image01", 66, Genre.COMEDY);
@@ -64,11 +61,10 @@ class ReservationJpaRepositoryTest {
     @DisplayName("예약을 저장하고 조회할 수 있어야 한다.")
     @Test
     void givenReservation_whenSaveAndFindById_thenReturnReservation() {
-
-
+        // Given
         Optional<Reservation> foundReservation = reservationJpaRepository.findById(reservation.getId());
 
-        // Then
+        // When & Then
         assertThat(foundReservation).isPresent();
         assertThat(foundReservation.get().getMember().getName()).isEqualTo("Test User");
     }

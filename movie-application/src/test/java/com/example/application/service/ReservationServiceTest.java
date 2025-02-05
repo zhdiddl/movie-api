@@ -62,7 +62,7 @@ class ReservationServiceTest {
     private DistributedLockExecutor distributedLockExecutor;
 
     @InjectMocks
-    private ReservationService reservationService;
+    private ReservationService sut;
 
     private ReservationRequestDto requestDto;
     private Screening screening;
@@ -108,7 +108,7 @@ class ReservationServiceTest {
         when(member.getName()).thenReturn("Test User");
 
         // When
-        ReservationResponseDto response = reservationService.create(requestDto);
+        ReservationResponseDto response = sut.create(requestDto);
 
         // Then
         assertNotNull(response);
@@ -130,7 +130,7 @@ class ReservationServiceTest {
         when(distributedLockExecutor.executeWithLock(anyString(), anyLong(), anyLong(), any())).thenReturn(null);
 
         // When & Then
-        assertThrows(CustomException.class, () -> reservationService.create(requestDto));
+        assertThrows(CustomException.class, () -> sut.create(requestDto));
     }
 
     @DisplayName("최대 예약 가능 좌석 수 초과 시 예외 발생")
@@ -149,7 +149,7 @@ class ReservationServiceTest {
                 .validateMaxSeatsPerScreening(anyInt(), anyInt());
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> reservationService.create(requestDto));
+        CustomException exception = assertThrows(CustomException.class, () -> sut.create(requestDto));
         assertEquals(ErrorCode.MAX_SEATS_EXCEEDED, exception.getErrorCode());
     }
 
@@ -168,7 +168,7 @@ class ReservationServiceTest {
                 .validateSeatsAreConsecutive(anyList());
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> reservationService.create(requestDto));
+        CustomException exception = assertThrows(CustomException.class, () -> sut.create(requestDto));
         assertEquals(ErrorCode.SEATS_NOT_CONSECUTIVE, exception.getErrorCode());
     }
 
@@ -188,7 +188,7 @@ class ReservationServiceTest {
                 .validateSeatsExist(anyList(), anyList());
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> reservationService.create(requestDto));
+        CustomException exception = assertThrows(CustomException.class, () -> sut.create(requestDto));
         assertEquals(ErrorCode.SEAT_ALREADY_RESERVED, exception.getErrorCode());
     }
 
@@ -210,7 +210,7 @@ class ReservationServiceTest {
                 .thenThrow(new CustomException(ErrorCode.DISTRIBUTED_LOCK_FAILURE));
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> reservationService.create(requestDto));
+        CustomException exception = assertThrows(CustomException.class, () -> sut.create(requestDto));
         assertEquals(ErrorCode.DISTRIBUTED_LOCK_FAILURE, exception.getErrorCode());
     }
 

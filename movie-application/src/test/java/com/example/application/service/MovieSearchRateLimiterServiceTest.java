@@ -22,7 +22,7 @@ class MovieSearchRateLimiterServiceTest {
     private RateLimiterPort rateLimiterPort;
 
     @InjectMocks
-    private MovieSearchRateLimiterService movieSearchRateLimiterService;
+    private MovieSearchRateLimiterService sut;
 
     private String testIp;
 
@@ -39,7 +39,7 @@ class MovieSearchRateLimiterServiceTest {
         when(rateLimiterPort.isAllowed(key, 50, 60)).thenReturn(true);
 
         // When
-        boolean result = movieSearchRateLimiterService.isAllowed(testIp);
+        boolean result = sut.isAllowed(testIp);
 
         // Then
         assertTrue(result, "첫 번째 요청은 허용되어야 합니다.");
@@ -54,7 +54,7 @@ class MovieSearchRateLimiterServiceTest {
         when(rateLimiterPort.isAllowed(key, 50, 60)).thenReturn(false);
 
         // When
-        boolean result = movieSearchRateLimiterService.isAllowed(testIp);
+        boolean result = sut.isAllowed(testIp);
 
         // Then
         assertFalse(result, "요청 제한을 초과하면 차단되어야 합니다.");

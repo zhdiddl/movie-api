@@ -27,7 +27,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 class ReservationJpaRepositoryTest {
 
     @Autowired
-    private ReservationJpaRepository reservationJpaRepository;
+    private ReservationJpaRepository sut;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -53,7 +53,7 @@ class ReservationJpaRepositoryTest {
 
         // Reservation 생성 후 저장
         reservation = Reservation.of(screening, member);
-        reservationJpaRepository.save(reservation);
+        sut.save(reservation);
         entityManager.flush();
         entityManager.clear();
     }
@@ -62,7 +62,7 @@ class ReservationJpaRepositoryTest {
     @Test
     void givenReservation_whenSaveAndFindById_thenReturnReservation() {
         // Given
-        Optional<Reservation> foundReservation = reservationJpaRepository.findById(reservation.getId());
+        Optional<Reservation> foundReservation = sut.findById(reservation.getId());
 
         // When & Then
         assertThat(foundReservation).isPresent();
@@ -73,12 +73,12 @@ class ReservationJpaRepositoryTest {
     @Test
     void givenScreeningAndMember_whenCountReservations_thenReturnCount() {
         // Given
-        reservationJpaRepository.save(reservation);
+        sut.save(reservation);
         entityManager.flush();
         entityManager.clear();
 
         // When
-        int count = reservationJpaRepository.countByScreeningAndMember(screening, member);
+        int count = sut.countByScreeningAndMember(screening, member);
 
         // Then
         assertThat(count).isEqualTo(1);
@@ -88,14 +88,14 @@ class ReservationJpaRepositoryTest {
     @Test
     void givenReservations_whenDeleteAll_thenAllReservationsAreDeleted() {
         // Given
-        reservationJpaRepository.save(reservation);
-        reservationJpaRepository.save(reservation);
+        sut.save(reservation);
+        sut.save(reservation);
         entityManager.flush();
         entityManager.clear();
 
         // When
-        reservationJpaRepository.deleteAll();
-        long count = reservationJpaRepository.countByScreeningAndMember(screening, member);
+        sut.deleteAll();
+        long count = sut.countByScreeningAndMember(screening, member);
 
         // Then
         assertThat(count).isEqualTo(0);

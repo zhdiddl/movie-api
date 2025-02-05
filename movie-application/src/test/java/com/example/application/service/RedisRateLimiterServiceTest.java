@@ -24,7 +24,7 @@ class RedisRateLimiterServiceTest {
     private RedisTemplate<String, String> redisTemplate;
 
     @InjectMocks
-    private RedisRateLimiterService redisRateLimiterService;
+    private RedisRateLimiterService sut;
 
 
     @DisplayName("RateLimiter가 요청을 허용하면 true를 반환한다.")
@@ -36,7 +36,7 @@ class RedisRateLimiterServiceTest {
                 .thenReturn(1L); // Redis Lua Script가 1 반환 (허용)
 
         // When
-        boolean result = redisRateLimiterService.isAllowed(key, 50, 60);
+        boolean result = sut.isAllowed(key, 50, 60);
 
         // Then
         assertTrue(result, "Rate Limiting이 허용된 경우 true를 반환해야 합니다.");
@@ -51,7 +51,7 @@ class RedisRateLimiterServiceTest {
                 .thenReturn(0L); // Redis Lua Script가 0 반환 (차단)
 
         // When
-        boolean result = redisRateLimiterService.isAllowed(key, 50, 60);
+        boolean result = sut.isAllowed(key, 50, 60);
 
         // Then
         assertFalse(result, "Rate Limiting이 초과된 경우 false를 반환해야 합니다.");

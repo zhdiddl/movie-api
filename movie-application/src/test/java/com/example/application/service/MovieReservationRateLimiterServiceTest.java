@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.application.port.out.RateLimiterPort;
-import com.example.domain.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ class MovieReservationRateLimiterServiceTest {
     private RateLimiterPort rateLimiterPort;
 
     @InjectMocks
-    private MovieReservationRateLimiterService movieReservationRateLimiterService;
+    private MovieReservationRateLimiterService sut;
 
     private Long screeningId;
     private Long memberId;
@@ -44,7 +43,7 @@ class MovieReservationRateLimiterServiceTest {
         when(rateLimiterPort.isAllowed(key, 1, 300)).thenReturn(true);
 
         // When
-        boolean result = movieReservationRateLimiterService.isAllowed(screeningId, memberId);
+        boolean result = sut.isAllowed(screeningId, memberId);
 
         // Then
         assertTrue(result, "첫 번째 요청은 허용되어야 합니다.");
@@ -58,7 +57,7 @@ class MovieReservationRateLimiterServiceTest {
         when(rateLimiterPort.isAllowed(key, 1, 300)).thenReturn(false);
 
         // When
-        boolean result = movieReservationRateLimiterService.isAllowed(screeningId, memberId);
+        boolean result = sut.isAllowed(screeningId, memberId);
 
         // Then
         assertFalse(result, "5분 내 중복 요청은 차단되어야 합니다.");

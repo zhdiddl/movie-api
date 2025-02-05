@@ -39,7 +39,7 @@ class MovieServiceTest {
     @Mock private ScreeningRepositoryPort screeningRepositoryPort;
     @Mock private TheaterRepositoryPort theaterRepositoryPort;
 
-    @InjectMocks private MovieService movieService;
+    @InjectMocks private MovieService sut;
 
     private Movie mockMovie;
     private Theater mockTheater;
@@ -84,7 +84,7 @@ class MovieServiceTest {
         when(movieRepositoryPort.findBy(criteria, sort)).thenReturn(List.of(mockMovie));
 
         // When
-        List<MovieResponseDto> result = movieService.findMovies(criteria);
+        List<MovieResponseDto> result = sut.findMovies(criteria);
 
         // Then
         assertFalse(result.isEmpty());
@@ -103,7 +103,7 @@ class MovieServiceTest {
         when(movieRepositoryPort.findBy(criteria, sort)).thenReturn(Collections.emptyList());
 
         // When
-        List<MovieResponseDto> result = movieService.findMovies(criteria);
+        List<MovieResponseDto> result = sut.findMovies(criteria);
 
         // Then
         assertTrue(result.isEmpty());
@@ -114,7 +114,7 @@ class MovieServiceTest {
     @DisplayName("영화 생성 요청이 들어오면 영화가 저장된다.")
     void givenValidRequest_whenCreateMovie_thenSaveMovie() {
         // When
-        movieService.createMovie(movieRequestDto);
+        sut.createMovie(movieRequestDto);
 
         // Then
         verify(movieRepositoryPort, times(1)).save(any(Movie.class));
@@ -128,7 +128,7 @@ class MovieServiceTest {
         when(theaterRepositoryPort.findById(1L)).thenReturn(Optional.of(mockTheater));
 
         // When
-        movieService.addScreeningToMovie(1L, screeningRequestDto);
+        sut.addScreeningToMovie(1L, screeningRequestDto);
 
         // Then
         verify(screeningRepositoryPort, times(1)).save(any(Screening.class));
@@ -142,7 +142,7 @@ class MovieServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class,
-                () -> movieService.addScreeningToMovie(1L, screeningRequestDto));
+                () -> sut.addScreeningToMovie(1L, screeningRequestDto));
 
         assertEquals(ErrorCode.INVALID_MOVIE, exception.getErrorCode());
         verify(movieRepositoryPort, times(1)).findById(1L);
@@ -158,7 +158,7 @@ class MovieServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class,
-                () -> movieService.addScreeningToMovie(1L, screeningRequestDto));
+                () -> sut.addScreeningToMovie(1L, screeningRequestDto));
 
         assertEquals(ErrorCode.INVALID_THEATER, exception.getErrorCode());
         verify(movieRepositoryPort, times(1)).findById(1L);

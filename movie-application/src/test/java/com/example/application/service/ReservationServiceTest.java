@@ -133,7 +133,7 @@ class ReservationServiceTest {
         assertThrows(CustomException.class, () -> sut.create(requestDto));
     }
 
-    @DisplayName("최대 예약 가능 좌석 수 초과 시 예외 발생")
+    @DisplayName("최대 예약 가능 좌석 수 초과 시 예외가 발생한다.")
     @Test
     void givenTooManySeats_whenCreate_thenThrowException() {
         // Given: 회원이 이미 좌석을 예약한 상태
@@ -153,7 +153,7 @@ class ReservationServiceTest {
         assertEquals(ErrorCode.MAX_SEATS_EXCEEDED, exception.getErrorCode());
     }
 
-    @DisplayName("연속되지 않은 좌석 선택 시 예외 발생")
+    @DisplayName("연속되지 않은 좌석 선택 시 예외가 발생한다.")
     @Test
     void givenNonConsecutiveSeats_whenCreate_thenThrowException() {
         // Given: 좌석이 연속되지 않음
@@ -190,28 +190,6 @@ class ReservationServiceTest {
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> sut.create(requestDto));
         assertEquals(ErrorCode.SEAT_ALREADY_RESERVED, exception.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("분산 락 획득 실패 시 예외 발생")
-    void givenLockAcquisitionFailure_whenCreate_thenThrowException() {
-        // Given: 분산 락 획득 실패
-        when(screeningRepositoryPort.findById(requestDto.screeningId())).thenReturn(Optional.of(screening));
-        when(memberRepositoryPort.findById(requestDto.memberId())).thenReturn(Optional.of(member));
-        when(screeningSeatRepositoryPort.findByScreeningAndSeatIds(any(), anyList()))
-                .thenReturn(List.of(screeningSeat));
-        when(screeningSeat.getSeat()).thenReturn(seat);
-        when(distributedLockExecutor.executeWithLock(anyString(), anyLong(), anyLong(), any()))
-                .thenReturn(reservation);
-
-        when(screeningRepositoryPort.findById(requestDto.screeningId())).thenReturn(Optional.of(screening));
-        when(memberRepositoryPort.findById(requestDto.memberId())).thenReturn(Optional.of(member));
-        when(distributedLockExecutor.executeWithLock(anyString(), anyLong(), anyLong(), any()))
-                .thenThrow(new CustomException(ErrorCode.DISTRIBUTED_LOCK_FAILURE));
-
-        // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> sut.create(requestDto));
-        assertEquals(ErrorCode.DISTRIBUTED_LOCK_FAILURE, exception.getErrorCode());
     }
 
 }

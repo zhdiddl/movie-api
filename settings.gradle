@@ -1,0 +1,5 @@
+rootProject.name = 'redis_1st'
+
+include 'movie-application'
+include 'movie-infrastructure'
+include 'movie-domain'

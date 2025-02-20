@@ -17,12 +17,18 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 
 @DisplayName("[JPA 테스트] 예약 리포지토리")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 DB에서 테스트
+@Import(ReservationJpaRepositoryTest.TestRedisConfig.class)
 @DataJpaTest
 class ReservationJpaRepositoryTest {
 
@@ -99,6 +105,14 @@ class ReservationJpaRepositoryTest {
 
         // Then
         assertThat(count).isEqualTo(0);
+    }
+
+    @TestConfiguration
+    static class TestRedisConfig {
+        @Bean(name = "mockRedisTemplate")
+        public RedisTemplate mockRedisTemplate() {
+            return Mockito.mock(RedisTemplate.class);
+        }
     }
 
 }

@@ -34,12 +34,13 @@ public class Seat extends AuditingFields {
 
     protected Seat() {}
 
-    private Seat(SeatNumber seatNumber) {
+    private Seat(SeatNumber seatNumber, Theater theater) {
         this.seatNumber = seatNumber;
+        this.theater = theater;
     }
 
-    public static Seat of(SeatNumber seatNumber) {
-        return new Seat(seatNumber);
+    public static Seat of(SeatNumber seatNumber, Theater theater) {
+        return new Seat(seatNumber, theater);
     }
 
 }

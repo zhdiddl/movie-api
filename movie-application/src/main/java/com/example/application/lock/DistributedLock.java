@@ -5,6 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @distributedLock 커스텀 메서드를 선언하는 인터페이스
+ * 현재는 AOP 대신 함수형 락을 적용하도록 리팩토링하여 사용하지 않는다.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DistributedLock {

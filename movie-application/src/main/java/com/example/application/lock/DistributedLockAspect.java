@@ -10,6 +10,10 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
+/**
+ * @distributedLock 붙인 메서드를 감지, Redisson 락을 실제 적용하는 클래스
+ * 현재는 AOP 대신 함수형 락을 적용하도록 리팩토링하여 사용하지 않는다.
+ */
 @Slf4j
 @Aspect
 @Component
